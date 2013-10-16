@@ -1,19 +1,17 @@
-import java.awt.Point;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Arrays;
 import java.util.List;
 
 public class GameField {
-    final static Charset ENCODING = StandardCharsets.UTF_8;
+    final static Charset ENCODING      = StandardCharsets.UTF_8;
 
     private char[][]     field;
-    private char         WALL     = '#';
-    private int effectiveSize = 0;
+    private char         WALL          = '#';
+    private int          effectiveSize = 0;
 
     public GameField(String filename) throws IOException {
         Path path = Paths.get(filename);
@@ -31,8 +29,8 @@ public class GameField {
         }
     }
 
-    public boolean isWall(Point p) {
-        return field[p.x][p.y] == WALL;
+    public boolean isWall(TextPoint p) {
+        return field[p.row][p.col] == WALL;
     }
 
     public int getEffectiveSize() {

@@ -1,20 +1,19 @@
-import java.awt.Point;
 import java.util.ArrayList;
 import java.util.List;
 
 public class Snake {
-    private List<Point> snake  = new ArrayList<Point>();
-    private int         dirCol = 0;                     // point.x
-    private int         dirRow = 0;                     // point.y
+    private List<TextPoint> snake  = new ArrayList<TextPoint>();
+    private int             dirCol = 0;
+    private int             dirRow = 0;
 
-    public Snake(Point head, int snakeSize, Direction direction) {
+    public Snake(TextPoint head, int snakeSize, Direction direction) {
         snake.add(head);
         turn(direction);
         for (int i = 1; i < snakeSize; i++) {
-            Point p = new Point(head.x - dirRow * i, head.y - dirCol * i);
+            TextPoint p = new TextPoint(head.row - dirRow * i, head.col
+                    - dirCol * i);
             snake.add(p);
         }
-
     }
 
     public enum Direction {
@@ -25,19 +24,18 @@ public class Snake {
         return snake.size();
     }
 
-    public boolean isOnSnake(Point p) {
+    public boolean isOnSnake(TextPoint p) {
         return snake.contains(p);
     }
 
-    public int add() {
-        Point head = new Point(snake.get(0));
-        head.x += dirRow;
-        head.y += dirCol;
+    public void add() {
+        TextPoint head = new TextPoint(snake.get(0));
+        head.row += dirRow;
+        head.col += dirCol;
         snake.add(0, head);
-        return snake.size();
     }
 
-    protected List<Point> getSnake() {
+    protected List<TextPoint> getSnake() {
         return snake;
     }
 
@@ -68,10 +66,10 @@ public class Snake {
                     + direction);
         }
 
-        // if direction was changed to opposite
-        Point head = new Point(snake.get(0));
-        head.x += dirRow;
-        head.y += dirCol;
+        // if direction was changed to opposite (new point will be on snake)
+        TextPoint head = new TextPoint(snake.get(0));
+        head.row += dirRow;
+        head.col += dirCol;
         if (snake.contains(head)) {
             // don't change direction
             dirCol = oldCol;
@@ -83,5 +81,4 @@ public class Snake {
         add();
         snake.remove(snake.size() - 1);
     }
-
 }
