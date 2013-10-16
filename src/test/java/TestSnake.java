@@ -33,7 +33,7 @@ public class TestSnake {
 
     @Test
     public void testIsOnSnakeTrue() {
-        Point p = new Point(1, 5);
+        Point p = new Point(head.x, head.y - snakeSize + 1);
         boolean expected = true;
         boolean actual = snake.isOnSnake(p);
         assertEquals("Check Is point on Snake.", expected, actual);
@@ -41,32 +41,130 @@ public class TestSnake {
 
     @Test
     public void testIsOnSnakeFalse() {
-        Point p = new Point(1, 6);
+        Point p = new Point(head.x, head.y + 1);
         boolean expected = false;
         boolean actual = snake.isOnSnake(p);
         assertEquals("Check Is point on Snake.", expected, actual);
     }
 
     @Test
-    public void testAdd() {
-        int expected = snakeSize + 1;
-        int actual = snake.add();
-        assertEquals("Check Snake size.", expected, actual);
-    }
-
-    @Test
-    public void testSnake() {
+    public void testGetSnake() {
         List<Point> expected = new ArrayList<Point>();
         expected.add(head);
         expected.add(new Point(head.x, head.y - 1));
         expected.add(new Point(head.x, head.y - 2));
         List<Point> actual = snake.getSnake();
         assertEquals("Check Snake.", expected, actual);
+    }
 
+    @Test
+    public void testAdd() {
         snake.add();
+
+        List<Point> expected = new ArrayList<Point>();
+        expected.add(head);
+        expected.add(new Point(head.x, head.y - 1));
+        expected.add(new Point(head.x, head.y - 2));
         expected.add(0, new Point(head.x, head.y + 1));
-        actual = snake.getSnake();
+        List<Point> actual = snake.getSnake();
         assertEquals("Check Snake.", expected, actual);
     }
 
+    @Test
+    public void testTurnUp() {
+        snake.turn(Snake.Direction.UP);
+        snake.add();
+
+        List<Point> expected = new ArrayList<Point>();
+        expected.add(head);
+        expected.add(new Point(head.x, head.y - 1));
+        expected.add(new Point(head.x, head.y - 2));
+        expected.add(0, new Point(head.x - 1, head.y));
+        List<Point> actual = snake.getSnake();
+        assertEquals("Check Snake.", expected, actual);
+    }
+
+    @Test
+    public void testTurnDown() {
+        snake.turn(Snake.Direction.DOWN);
+        snake.add();
+
+        List<Point> expected = new ArrayList<Point>();
+        expected.add(head);
+        expected.add(new Point(head.x, head.y - 1));
+        expected.add(new Point(head.x, head.y - 2));
+        expected.add(0, new Point(head.x + 1, head.y));
+        List<Point> actual = snake.getSnake();
+        assertEquals("Check Snake.", expected, actual);
+    }
+
+    @Test
+    public void testTurnRight() {
+        snake = new Snake(head, snakeSize, Snake.Direction.UP);
+        snake.turn(Snake.Direction.RIGHT);
+        snake.add();
+
+        List<Point> expected = new ArrayList<Point>();
+        expected.add(head);
+        expected.add(new Point(head.x + 1, head.y));
+        expected.add(new Point(head.x + 2, head.y));
+        expected.add(0, new Point(head.x, head.y + 1));
+        List<Point> actual = snake.getSnake();
+        assertEquals("Check Snake.", expected, actual);
+    }
+
+    @Test
+    public void testTurnLeft() {
+        snake = new Snake(head, snakeSize, Snake.Direction.UP);
+        snake.turn(Snake.Direction.LEFT);
+        snake.add();
+
+        List<Point> expected = new ArrayList<Point>();
+        expected.add(head);
+        expected.add(new Point(head.x + 1, head.y));
+        expected.add(new Point(head.x + 2, head.y));
+        expected.add(0, new Point(head.x, head.y - 1));
+        List<Point> actual = snake.getSnake();
+        assertEquals("Check Snake.", expected, actual);
+    }
+
+    @Test
+    public void testTurnSameDirection() {
+        snake.turn(direction);
+        snake.add();
+
+        List<Point> expected = new ArrayList<Point>();
+        expected.add(head);
+        expected.add(new Point(head.x, head.y - 1));
+        expected.add(new Point(head.x, head.y - 2));
+        expected.add(0, new Point(head.x, head.y + 1));
+        List<Point> actual = snake.getSnake();
+        assertEquals("Check Snake.", expected, actual);
+    }
+
+    @Test
+    public void testTurnOppositeDirection() {
+        snake.turn(Snake.Direction.LEFT);
+        snake.add();
+
+        List<Point> expected = new ArrayList<Point>();
+        expected.add(head);
+        expected.add(new Point(head.x, head.y - 1));
+        expected.add(new Point(head.x, head.y - 2));
+        expected.add(0, new Point(head.x, head.y + 1));
+        List<Point> actual = snake.getSnake();
+        assertEquals("Check Snake.", expected, actual);
+    }
+
+    @Test
+    public void testMove() {
+        snake.move();
+
+        List<Point> expected = new ArrayList<Point>();
+        expected.add(new Point(head.x, head.y + 1));
+        expected.add(new Point(head.x, head.y));
+        expected.add(new Point(head.x, head.y - 1));
+        List<Point> actual = snake.getSnake();
+        assertEquals("Check Snake.", expected, actual);
+    }
 }
