@@ -22,4 +22,9 @@ public class TextPoint {
             return true;
         return false;
     }
+    
+    @Override
+    public String toString() {
+        return "[row=" + row + ",col=" + col + "]";
+    }
 }

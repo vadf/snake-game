@@ -35,10 +35,6 @@ public class Snake {
         snake.add(0, head);
     }
 
-    protected List<TextPoint> getSnake() {
-        return snake;
-    }
-
     public void turn(Direction direction) {
         int oldCol = dirCol;
         int oldRow = dirRow;
@@ -80,5 +76,9 @@ public class Snake {
     public void move() {
         add();
         snake.remove(snake.size() - 1);
+    }
+
+    public TextPoint getHead() {
+        return snake.get(0);
     }
 }

@@ -1,6 +1,4 @@
 import static org.junit.Assert.*;
-import java.util.ArrayList;
-import java.util.List;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -45,25 +43,18 @@ public class TestSnake {
     }
 
     @Test
-    public void testGetSnake() {
-        List<TextPoint> expected = new ArrayList<TextPoint>();
-        expected.add(head);
-        expected.add(new TextPoint(head.row, head.col - 1));
-        expected.add(new TextPoint(head.row, head.col - 2));
-        List<TextPoint> actual = snake.getSnake();
-        assertEquals("Check Snake.", expected, actual);
+    public void testGetHead() {
+        TextPoint expected = new TextPoint(head);
+        TextPoint actual = snake.getHead();
+        assertEquals("Check Snake Head.", expected, actual);
     }
 
     @Test
     public void testAdd() {
         snake.add();
 
-        List<TextPoint> expected = new ArrayList<TextPoint>();
-        expected.add(head);
-        expected.add(new TextPoint(head.row, head.col - 1));
-        expected.add(new TextPoint(head.row, head.col - 2));
-        expected.add(0, new TextPoint(head.row, head.col + 1));
-        List<TextPoint> actual = snake.getSnake();
+        TextPoint expected = new TextPoint(head.row, head.col + 1);
+        TextPoint actual = snake.getHead();
         assertEquals("Check Snake.", expected, actual);
     }
 
@@ -72,12 +63,8 @@ public class TestSnake {
         snake.turn(Snake.Direction.UP);
         snake.add();
 
-        List<TextPoint> expected = new ArrayList<TextPoint>();
-        expected.add(head);
-        expected.add(new TextPoint(head.row, head.col - 1));
-        expected.add(new TextPoint(head.row, head.col - 2));
-        expected.add(0, new TextPoint(head.row - 1, head.col));
-        List<TextPoint> actual = snake.getSnake();
+        TextPoint expected = new TextPoint(head.row - 1, head.col);
+        TextPoint actual = snake.getHead();
         assertEquals("Check Snake.", expected, actual);
     }
 
@@ -86,12 +73,8 @@ public class TestSnake {
         snake.turn(Snake.Direction.DOWN);
         snake.add();
 
-        List<TextPoint> expected = new ArrayList<TextPoint>();
-        expected.add(head);
-        expected.add(new TextPoint(head.row, head.col - 1));
-        expected.add(new TextPoint(head.row, head.col - 2));
-        expected.add(0, new TextPoint(head.row + 1, head.col));
-        List<TextPoint> actual = snake.getSnake();
+        TextPoint expected = new TextPoint(head.row + 1, head.col);
+        TextPoint actual = snake.getHead();
         assertEquals("Check Snake.", expected, actual);
     }
 
@@ -101,12 +84,8 @@ public class TestSnake {
         snake.turn(Snake.Direction.RIGHT);
         snake.add();
 
-        List<TextPoint> expected = new ArrayList<TextPoint>();
-        expected.add(head);
-        expected.add(new TextPoint(head.row + 1, head.col));
-        expected.add(new TextPoint(head.row + 2, head.col));
-        expected.add(0, new TextPoint(head.row, head.col + 1));
-        List<TextPoint> actual = snake.getSnake();
+        TextPoint expected = new TextPoint(head.row, head.col + 1);
+        TextPoint actual = snake.getHead();
         assertEquals("Check Snake.", expected, actual);
     }
 
@@ -116,12 +95,8 @@ public class TestSnake {
         snake.turn(Snake.Direction.LEFT);
         snake.add();
 
-        List<TextPoint> expected = new ArrayList<TextPoint>();
-        expected.add(head);
-        expected.add(new TextPoint(head.row + 1, head.col));
-        expected.add(new TextPoint(head.row + 2, head.col));
-        expected.add(0, new TextPoint(head.row, head.col - 1));
-        List<TextPoint> actual = snake.getSnake();
+        TextPoint expected = new TextPoint(head.row, head.col - 1);
+        TextPoint actual = snake.getHead();
         assertEquals("Check Snake.", expected, actual);
     }
 
@@ -130,12 +105,8 @@ public class TestSnake {
         snake.turn(direction);
         snake.add();
 
-        List<TextPoint> expected = new ArrayList<TextPoint>();
-        expected.add(head);
-        expected.add(new TextPoint(head.row, head.col - 1));
-        expected.add(new TextPoint(head.row, head.col - 2));
-        expected.add(0, new TextPoint(head.row, head.col + 1));
-        List<TextPoint> actual = snake.getSnake();
+        TextPoint expected = new TextPoint(head.row, head.col + 1);
+        TextPoint actual = snake.getHead();
         assertEquals("Check Snake.", expected, actual);
     }
 
@@ -144,12 +115,8 @@ public class TestSnake {
         snake.turn(Snake.Direction.LEFT);
         snake.add();
 
-        List<TextPoint> expected = new ArrayList<TextPoint>();
-        expected.add(head);
-        expected.add(new TextPoint(head.row, head.col - 1));
-        expected.add(new TextPoint(head.row, head.col - 2));
-        expected.add(0, new TextPoint(head.row, head.col + 1));
-        List<TextPoint> actual = snake.getSnake();
+        TextPoint expected = new TextPoint(head.row, head.col + 1);
+        TextPoint actual = snake.getHead();
         assertEquals("Check Snake.", expected, actual);
     }
 
@@ -157,11 +124,8 @@ public class TestSnake {
     public void testMove() {
         snake.move();
 
-        List<TextPoint> expected = new ArrayList<TextPoint>();
-        expected.add(new TextPoint(head.row, head.col + 1));
-        expected.add(new TextPoint(head.row, head.col));
-        expected.add(new TextPoint(head.row, head.col - 1));
-        List<TextPoint> actual = snake.getSnake();
+        TextPoint expected = new TextPoint(head.row, head.col + 1);
+        TextPoint actual = snake.getHead();
         assertEquals("Check Snake.", expected, actual);
     }
 }
