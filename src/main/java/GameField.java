@@ -37,7 +37,7 @@ public class GameField {
         return effectiveSize;
     }
 
-    public char[][] getField() {
+    protected char[][] getField() {
         return field;
     }
 }
