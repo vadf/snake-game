@@ -59,4 +59,18 @@ public class TestGameField {
                     expected[i], actual[i]);
         }
     }
+    
+    @Test
+    public void testGetRowsNum() {
+        int expected = 4;
+        int actual = field.getRowsNum();
+        assertEquals("Check number of rows.", expected, actual);
+    }
+    
+    @Test
+    public void testGetColsNum() {
+        int expected = 7;
+        int actual = field.getColsNum();
+        assertEquals("Check number of columns.", expected, actual);
+    }
 }

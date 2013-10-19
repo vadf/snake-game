@@ -40,4 +40,12 @@ public class GameField {
     protected char[][] getField() {
         return field;
     }
+
+    public int getRowsNum() {
+        return field.length;
+    }
+
+    public int getColsNum() {
+        return field[0].length;
+    }
 }
