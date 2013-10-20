@@ -1,4 +1,7 @@
 import static org.junit.Assert.*;
+
+import java.util.List;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -18,23 +21,21 @@ public class TestGameField {
     }
 
     @Test
-    public void testIsWallTrue() {
+    public void testIsWallTrue() throws Exception {
         TextPoint p = new TextPoint(3, 6);
-        boolean expected = true;
         boolean actual = field.isWall(p);
-        assertEquals("Check that point is on a wall.", expected, actual);
+        assertTrue("Check that point is on a wall.", actual);
     }
 
     @Test
-    public void testIsWallFalse() {
+    public void testIsWallFalse() throws Exception {
         TextPoint p = new TextPoint(2, 5);
-        boolean expected = false;
         boolean actual = field.isWall(p);
-        assertEquals("Check that point is not on a wall.", expected, actual);
+        assertFalse("Check that point is not on a wall.", actual);
     }
 
-    @Test(expected = ArrayIndexOutOfBoundsException.class)
-    public void testIsWallOutOfBoundary() {
+    @Test(expected = Exception.class)
+    public void testIsWallOutOfBoundary() throws Exception {
         TextPoint p = new TextPoint(4, 1);
         field.isWall(p);
     }
@@ -48,29 +49,38 @@ public class TestGameField {
     }
 
     @Test
-    public void testGetField() {
-        char[][] expected = { { '#', '#', '#', '#', '#', '#', '#' },
-                { '#', ' ', ' ', ' ', ' ', ' ', '#' },
-                { '#', ' ', ' ', '#', ' ', ' ', '#' },
-                { '#', '#', '#', '#', '#', '#', '#' } };
-        char[][] actual = field.getField();
-        for (int i = 0; i < actual.length; i++) {
-            assertArrayEquals("Check that field line " + i + " is correct.",
-                    expected[i], actual[i]);
-        }
+    public void testGetWalls() {
+        int actual = 19;
+        List<TextPoint> walls = field.getWalls();
+        int expected = walls.size();
+        assertEquals("Check number of walls.", expected, actual);
     }
-    
+
     @Test
     public void testGetRowsNum() {
         int expected = 4;
         int actual = field.getRowsNum();
         assertEquals("Check number of rows.", expected, actual);
     }
-    
+
     @Test
     public void testGetColsNum() {
         int expected = 7;
         int actual = field.getColsNum();
         assertEquals("Check number of columns.", expected, actual);
+    }
+
+    @Test
+    public void testIsInFieldTrue() {
+        TextPoint p = new TextPoint(0, 6);
+        boolean actual = field.isInField(p);
+        assertTrue("Check number of columns.", actual);
+    }
+
+    @Test
+    public void testIsInFieldFalse() {
+        TextPoint p = new TextPoint(4, 0);
+        boolean actual = field.isInField(p);
+        assertFalse("Check number of columns.", actual);
     }
 }

@@ -11,7 +11,7 @@ public class TestSnake {
 
     @Before
     public void setUp() throws Exception {
-        snake = new Snake(head, snakeSize, direction);
+        snake = new Snake(head, direction, snakeSize);
     }
 
     @After
@@ -80,7 +80,7 @@ public class TestSnake {
 
     @Test
     public void testTurnRight() {
-        snake = new Snake(head, snakeSize, Snake.Direction.UP);
+        snake = new Snake(head, Snake.Direction.UP, snakeSize);
         snake.turn(Snake.Direction.RIGHT);
         snake.add();
 
@@ -91,7 +91,7 @@ public class TestSnake {
 
     @Test
     public void testTurnLeft() {
-        snake = new Snake(head, snakeSize, Snake.Direction.UP);
+        snake = new Snake(head, Snake.Direction.UP, snakeSize);
         snake.turn(Snake.Direction.LEFT);
         snake.add();
 

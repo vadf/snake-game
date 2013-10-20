@@ -22,4 +22,7 @@ public class Stars {
         return stars.contains(point);
     }
 
+    public List<TextPoint> getStars() {
+        return new ArrayList<TextPoint>(stars);
+    }
 }

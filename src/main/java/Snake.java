@@ -6,7 +6,7 @@ public class Snake {
     private int             dirCol = 0;
     private int             dirRow = 0;
 
-    public Snake(TextPoint head, int snakeSize, Direction direction) {
+    public Snake(TextPoint head, Direction direction, int snakeSize) {
         snake.add(head);
         turn(direction);
         for (int i = 1; i < snakeSize; i++) {
@@ -80,5 +80,9 @@ public class Snake {
 
     public TextPoint getHead() {
         return snake.get(0);
+    }
+
+    public List<TextPoint> getSnake() {
+        return new ArrayList<TextPoint>(snake);
     }
 }
