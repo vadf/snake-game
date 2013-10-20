@@ -8,12 +8,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class GameField {
-    final static Charset    ENCODING      = StandardCharsets.UTF_8;
+    final static Charset    ENCODING = StandardCharsets.UTF_8;
 
-    private char            WALL          = '#';
-    private int             effectiveSize = 0;
-
-    private List<TextPoint> walls         = new ArrayList<TextPoint>();
+    private char            WALL     = '#';
+    private List<TextPoint> walls    = new ArrayList<TextPoint>();
     private int             rows;
     private int             cols;
 
@@ -30,8 +28,6 @@ public class GameField {
                 ch = line.charAt(j);
                 if (ch == WALL) {
                     walls.add(new TextPoint(i, j));
-                } else {
-                    effectiveSize++;
                 }
             }
             i++;
@@ -46,7 +42,7 @@ public class GameField {
     }
 
     public int getEffectiveSize() {
-        return effectiveSize;
+        return rows * cols - walls.size();
     }
 
     public int getRowsNum() {

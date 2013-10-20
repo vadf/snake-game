@@ -2,9 +2,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Snake {
-    private List<TextPoint> snake  = new ArrayList<TextPoint>();
-    private int             dirCol = 0;
-    private int             dirRow = 0;
+    private List<TextPoint>  snake  = new ArrayList<TextPoint>();
+    private int              dirCol = 0;
+    private int              dirRow = 0;
 
     public Snake(TextPoint head, Direction direction, int snakeSize) {
         snake.add(head);

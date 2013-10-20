@@ -2,7 +2,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Stars {
-    List<TextPoint> stars = new ArrayList<TextPoint>();
+    List<TextPoint>          stars = new ArrayList<TextPoint>();
 
     public boolean add(TextPoint point) {
         if (stars.contains(point))
