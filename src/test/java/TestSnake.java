@@ -1,4 +1,7 @@
 import static org.junit.Assert.*;
+
+import java.util.List;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -50,18 +53,41 @@ public class TestSnake {
     }
 
     @Test
-    public void testAdd() {
+    public void testMoveAdd() throws SnakeAddException {
+        List<TextPoint> expectedSnake = snake.getSnake();
+        snake.move();
         snake.add();
 
-        TextPoint expected = new TextPoint(head.row, head.col + 1);
-        TextPoint actual = snake.getHead();
-        assertEquals("Check Snake.", expected, actual);
+        TextPoint expectedHead = new TextPoint(head.row, head.col + 1);
+        TextPoint actualHead = snake.getHead();
+        assertEquals("Check Snake.", expectedHead, actualHead);
+
+        int expectedSize = 4;
+        int actualSize = snake.getSize();
+        assertEquals("Check Snake.", expectedSize, actualSize);
+
+        expectedSnake.add(0, expectedHead);
+        ;
+        List<TextPoint> actualSnake = snake.getSnake();
+        assertEquals("Check Snake.", expectedSnake, actualSnake);
+    }
+
+    @Test(expected = SnakeAddException.class)
+    public void testAddTwice() throws SnakeAddException {
+        snake.move();
+        snake.add();
+        snake.add();
+    }
+
+    @Test(expected = SnakeAddException.class)
+    public void testAddNull() throws SnakeAddException {
+        snake.add();
     }
 
     @Test
     public void testTurnUp() {
         snake.turn(Snake.Direction.UP);
-        snake.add();
+        snake.move();
 
         TextPoint expected = new TextPoint(head.row - 1, head.col);
         TextPoint actual = snake.getHead();
@@ -71,7 +97,7 @@ public class TestSnake {
     @Test
     public void testTurnDown() {
         snake.turn(Snake.Direction.DOWN);
-        snake.add();
+        snake.move();
 
         TextPoint expected = new TextPoint(head.row + 1, head.col);
         TextPoint actual = snake.getHead();
@@ -82,7 +108,7 @@ public class TestSnake {
     public void testTurnRight() {
         snake = new Snake(head, Snake.Direction.UP, snakeSize);
         snake.turn(Snake.Direction.RIGHT);
-        snake.add();
+        snake.move();
 
         TextPoint expected = new TextPoint(head.row, head.col + 1);
         TextPoint actual = snake.getHead();
@@ -93,7 +119,7 @@ public class TestSnake {
     public void testTurnLeft() {
         snake = new Snake(head, Snake.Direction.UP, snakeSize);
         snake.turn(Snake.Direction.LEFT);
-        snake.add();
+        snake.move();
 
         TextPoint expected = new TextPoint(head.row, head.col - 1);
         TextPoint actual = snake.getHead();
@@ -103,7 +129,7 @@ public class TestSnake {
     @Test
     public void testTurnSameDirection() {
         snake.turn(direction);
-        snake.add();
+        snake.move();
 
         TextPoint expected = new TextPoint(head.row, head.col + 1);
         TextPoint actual = snake.getHead();
@@ -113,7 +139,7 @@ public class TestSnake {
     @Test
     public void testTurnOppositeDirection() {
         snake.turn(Snake.Direction.LEFT);
-        snake.add();
+        snake.move();
 
         TextPoint expected = new TextPoint(head.row, head.col + 1);
         TextPoint actual = snake.getHead();

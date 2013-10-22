@@ -5,6 +5,7 @@ public class Snake {
     private List<TextPoint> snake  = new ArrayList<TextPoint>();
     private int             dirCol = 0;
     private int             dirRow = 0;
+    private TextPoint       tail;
 
     public Snake(TextPoint head, Direction direction, int snakeSize) {
         snake.add(head);
@@ -28,11 +29,12 @@ public class Snake {
         return snake.contains(p);
     }
 
-    public void add() {
-        TextPoint head = new TextPoint(snake.get(0));
-        head.row += dirRow;
-        head.col += dirCol;
-        snake.add(0, head);
+    public void add() throws SnakeAddException {
+        if (tail == null) {
+            throw new SnakeAddException("Impossible to add new point ot Snake");
+        }
+        snake.add(tail);
+        tail = null;
     }
 
     public void turn(Direction direction) {
@@ -74,8 +76,11 @@ public class Snake {
     }
 
     public void move() {
-        add();
-        snake.remove(snake.size() - 1);
+        TextPoint head = new TextPoint(snake.get(0));
+        head.row += dirRow;
+        head.col += dirCol;
+        snake.add(0, head);
+        tail = snake.remove(snake.size() - 1);
     }
 
     public TextPoint getHead() {
@@ -84,5 +89,19 @@ public class Snake {
 
     public List<TextPoint> getSnake() {
         return new ArrayList<TextPoint>(snake);
+    }
+}
+
+class SnakeAddException extends Exception {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 91781899778607805L;
+
+    public SnakeAddException() {
+    }
+
+    public SnakeAddException(String message) {
+        super(message);
     }
 }

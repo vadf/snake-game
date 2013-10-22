@@ -34,9 +34,9 @@ public class GameField {
         }
     }
 
-    public boolean isWall(TextPoint p) throws Exception {
+    public boolean isWall(TextPoint p) throws OutOfFieldException {
         if (!isInField(p)) {
-            throw new Exception("Point is out of game Field");
+            throw new OutOfFieldException("Point is out of game Field");
         }
         return walls.contains(p);
     }
@@ -62,5 +62,19 @@ public class GameField {
             return true;
         }
         return false;
+    }
+}
+
+class OutOfFieldException extends Exception {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 6911686971633228894L;
+
+    public OutOfFieldException() {
+    }
+
+    public OutOfFieldException(String message) {
+        super(message);
     }
 }

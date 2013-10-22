@@ -1,3 +1,4 @@
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
@@ -23,7 +24,7 @@ public class Game {
     public static void main(String[] args) {
         System.out.println("Hi Snake!");
         try {
-            InitData(defaultField, defaultSnakeHead, defaultSnakeDirection,
+            initData(defaultField, defaultSnakeHead, defaultSnakeDirection,
                     defaultSnakeSize, defaultNumOfStars);
             System.out.println(toText());
         } catch (Exception e) {
@@ -32,12 +33,12 @@ public class Game {
         }
     }
 
-    public static void InitData(String textField, TextPoint snakeHead,
+    public static void initData(String textField, TextPoint snakeHead,
             Snake.Direction snakeDirection, int snakeSize, int numOfStars)
-            throws Exception {
+            throws OutOfFieldException, IOException, GameSnakeOnWallException {
         field = new GameField(textField);
-        if (field.isWall(snakeHead) || !field.isInField(snakeHead)) {
-            throw new Exception("Snake Head is on the Wall or out of the Field");
+        if (field.isWall(snakeHead)) {
+            throw new GameSnakeOnWallException("Snake Head is on the Wall");
         }
         snake = new Snake(snakeHead, snakeDirection, snakeSize);
         stars = new Stars();
@@ -46,7 +47,7 @@ public class Game {
         }
     }
 
-    public static TextPoint newStar() throws Exception {
+    public static TextPoint newStar() throws OutOfFieldException {
         Random r = new Random(System.currentTimeMillis());
         int row = 0;
         int col = 0;
@@ -89,5 +90,32 @@ public class Game {
             str.append(textField[i]).append("\n");
 
         return str.toString();
+    }
+
+    public static void move() throws GameSnakeOnWallException,
+            OutOfFieldException, SnakeAddException {
+        snake.move();
+        TextPoint head = snake.getHead();
+        if (field.isWall(head)) {
+            throw new GameSnakeOnWallException("Snake Head is on the Wall");
+        }
+        if (stars.isStar(head)) {
+            snake.add();
+        }
+
+    }
+}
+
+class GameSnakeOnWallException extends Exception {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 1097078667154590888L;
+
+    public GameSnakeOnWallException() {
+    }
+
+    public GameSnakeOnWallException(String message) {
+        super(message);
     }
 }

@@ -21,21 +21,21 @@ public class TestGameField {
     }
 
     @Test
-    public void testIsWallTrue() throws Exception {
+    public void testIsWallTrue() throws OutOfFieldException {
         TextPoint p = new TextPoint(3, 6);
         boolean actual = field.isWall(p);
         assertTrue("Check that point is on a wall.", actual);
     }
 
     @Test
-    public void testIsWallFalse() throws Exception {
+    public void testIsWallFalse() throws OutOfFieldException {
         TextPoint p = new TextPoint(2, 5);
         boolean actual = field.isWall(p);
         assertFalse("Check that point is not on a wall.", actual);
     }
 
-    @Test(expected = Exception.class)
-    public void testIsWallOutOfBoundary() throws Exception {
+    @Test(expected = OutOfFieldException.class)
+    public void testIsWallOutOfBoundary() throws OutOfFieldException {
         TextPoint p = new TextPoint(4, 1);
         field.isWall(p);
     }
