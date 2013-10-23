@@ -68,17 +68,20 @@ public class Snake {
         TextPoint head = new TextPoint(snake.get(0));
         head.row += dirRow;
         head.col += dirCol;
-        if (snake.contains(head)) {
+        if (snake.size() > 1 && snake.get(1).equals(head)) {
             // don't change direction
             dirCol = oldCol;
             dirRow = oldRow;
         }
     }
 
-    public void move() {
+    public void move() throws SnakeCollision {
         TextPoint head = new TextPoint(snake.get(0));
         head.row += dirRow;
         head.col += dirCol;
+        if (snake.contains(head)) {
+            throw new SnakeCollision("Snake Head is now on Snake Body.");
+        }
         snake.add(0, head);
         tail = snake.remove(snake.size() - 1);
     }
@@ -102,6 +105,20 @@ class SnakeAddException extends Exception {
     }
 
     public SnakeAddException(String message) {
+        super(message);
+    }
+}
+
+class SnakeCollision extends Exception {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 9134731213963921113L;
+
+    public SnakeCollision() {
+    }
+
+    public SnakeCollision(String message) {
         super(message);
     }
 }

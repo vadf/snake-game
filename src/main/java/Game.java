@@ -53,6 +53,10 @@ public class Game {
         int col = 0;
         TextPoint point = null;
         while (true) {
+            if (field.getEffectiveSize() - snake.getSize()
+                    - stars.getStars().size() == 0) {
+                break;
+            }
             row = r.nextInt(field.getRowsNum());
             col = r.nextInt(field.getColsNum());
             point = new TextPoint(row, col);
@@ -93,7 +97,7 @@ public class Game {
     }
 
     public static void move() throws GameSnakeOnWallException,
-            OutOfFieldException, SnakeAddException {
+            OutOfFieldException, SnakeAddException, SnakeCollision {
         snake.move();
         TextPoint head = snake.getHead();
         if (field.isWall(head)) {
