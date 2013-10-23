@@ -125,9 +125,14 @@ public class TestGame {
         TextPoint actualHead = Game.snake.getHead();
         TextPoint expectedHead = new TextPoint(snakeHead.row, snakeHead.col + 1);
         assertEquals("Check Snake Head", expectedHead, actualHead);
+
         int expectedSize = 5;
         int actualSize = Game.snake.getSize();
         assertEquals("Check Snake Size", expectedSize, actualSize);
+
+        int expectedStars = 4;
+        int actualStars = Game.stars.getNumOfStars();
+        assertEquals("Check Number of Stars", expectedStars, actualStars);
     }
 
     @Test

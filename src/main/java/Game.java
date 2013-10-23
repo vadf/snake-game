@@ -22,14 +22,51 @@ public class Game {
     public final static char       STAR                  = '+';
 
     public static void main(String[] args) {
-        System.out.println("Hi Snake!");
         try {
             initData(defaultField, defaultSnakeHead, defaultSnakeDirection,
                     defaultSnakeSize, defaultNumOfStars);
-            System.out.println(toText());
+            TextPoint newStar = null;
+            char ch = 0;
+            while (true) {
+                System.out.println(toText());
+
+                // read key and turn
+                ch = readChar();
+                switch (ch) {
+                case 'w':
+                    snake.turn(Snake.Direction.UP);
+                    break;
+                case 'a':
+                    snake.turn(Snake.Direction.LEFT);
+                    break;
+                case 's':
+                    snake.turn(Snake.Direction.DOWN);
+                    break;
+                case 'd':
+                    snake.turn(Snake.Direction.RIGHT);
+                    break;
+                case '\n':
+                    continue;
+                }
+
+                // move snake
+                move();
+
+                // generate new star if needed
+                if (stars.getNumOfStars() < defaultNumOfStars) {
+                    newStar = newStar();
+                    if (newStar == null) {
+                        System.out.println("Congratulations");
+                        break;
+                    }
+                    stars.add(newStar);
+                }
+
+                // sleep
+                // Thread.sleep(1000);
+            }
         } catch (Exception e) {
-            e.printStackTrace();
-            System.err.println("Somethong goes wrong.");
+            System.err.println(e.getMessage());
         }
     }
 
@@ -105,8 +142,20 @@ public class Game {
         }
         if (stars.isStar(head)) {
             snake.add();
+            stars.remove(head);
         }
 
+    }
+
+    public static char readChar() {
+        try {
+            int ch = System.in.read();
+            return (char) ch;
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        return 0;
     }
 }
 
