@@ -16,7 +16,7 @@ public class GameController {
     protected final static char BODY = '*';
     protected final static char STAR = '+';
 
-    public static void initData(String textField, TextPoint snakeHead,
+    public static TextPoint initData(String textField, TextPoint snakeHead,
             Snake.Direction snakeDirection, int snakeSize, int numOfStars)
             throws OutOfFieldException, IOException, SnakeOnWallException {
         field = new GameField(textField);
@@ -30,6 +30,7 @@ public class GameController {
         }
 
         maxNumOfStars = numOfStars;
+        return new TextPoint(field.getRowsNum(), field.getColsNum());
     }
 
     public static TextPoint newStar() throws OutOfFieldException {
