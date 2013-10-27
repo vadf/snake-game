@@ -1,3 +1,4 @@
+import java.awt.event.KeyEvent;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
@@ -16,7 +17,7 @@ public class GameController {
     protected final static char BODY = '*';
     protected final static char STAR = '+';
 
-    public static void initData(String textField, TextPoint snakeHead,
+    public static TextPoint initData(String textField, TextPoint snakeHead,
             Snake.Direction snakeDirection, int snakeSize, int numOfStars)
             throws OutOfFieldException, IOException, SnakeOnWallException {
         field = new GameField(textField);
@@ -30,6 +31,7 @@ public class GameController {
         }
 
         maxNumOfStars = numOfStars;
+        return new TextPoint(field.getRowsNum(), field.getColsNum());
     }
 
     public static TextPoint newStar() throws OutOfFieldException {
@@ -108,26 +110,25 @@ public class GameController {
         return result;
     }
 
-    public static boolean setDirection(char ch) {
-        boolean result = true;
-        switch (ch) {
-        case 'w':
+    public static void setDirection(int key) {
+        switch (key) {
+        case KeyEvent.VK_UP:
+        case KeyEvent.VK_W:
             snake.turn(Snake.Direction.UP);
             break;
-        case 'a':
+        case KeyEvent.VK_LEFT:
+        case KeyEvent.VK_A:
             snake.turn(Snake.Direction.LEFT);
             break;
-        case 's':
+        case KeyEvent.VK_DOWN:
+        case KeyEvent.VK_S:
             snake.turn(Snake.Direction.DOWN);
             break;
-        case 'd':
+        case KeyEvent.VK_RIGHT:
+        case KeyEvent.VK_D:
             snake.turn(Snake.Direction.RIGHT);
             break;
-        default:
-            result = false;
         }
-
-        return result;
     }
 }
 

@@ -164,27 +164,4 @@ public class TestGameController {
         TextPoint star = GameController.newStar();
         assertNull("Check that new Star is not created", star);
     }
-
-    @Test
-    public void testSetDirection() throws OutOfFieldException, IOException,
-            SnakeOnWallException {
-        int snakeSize = 3;
-        Snake.Direction snakeDirection = Snake.Direction.RIGHT;
-        TextPoint snakeHead = new TextPoint(1, 4);
-        int numOfStars = 3;
-        GameController.initData(testField, snakeHead, snakeDirection,
-                snakeSize, numOfStars);
-
-        String ok = "wasd";
-        for (char ch : ok.toCharArray()) {
-            assertTrue("Check that Direction was changed",
-                    GameController.setDirection(ch));
-        }
-
-        String nok = "z 1 \n!";
-        for (char ch : nok.toCharArray()) {
-            assertFalse("Check that Direction was not changed",
-                    GameController.setDirection(ch));
-        }
-    }
 }
