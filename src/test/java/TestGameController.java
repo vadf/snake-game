@@ -90,7 +90,7 @@ public class TestGameController {
         int snakeSize = 3;
         Snake.Direction snakeDirection = Snake.Direction.RIGHT;
         TextPoint snakeHead = new TextPoint(1, 4);
-        int numOfStars = 3;
+        int numOfStars = 0;
         GameController.initData(testField, snakeHead, snakeDirection,
                 snakeSize, numOfStars);
 
@@ -98,6 +98,10 @@ public class TestGameController {
         TextPoint actual = GameController.snake.getHead();
         TextPoint expected = new TextPoint(snakeHead.row, snakeHead.col + 1);
         assertEquals("Check Snake Head", expected, actual);
+        
+        int expectedScore = 0;
+        int actualScore = GameController.getScore();
+        assertEquals("Check Score", expectedScore, actualScore);
     }
 
     @Test(expected = SnakeOnWallException.class)
@@ -135,6 +139,10 @@ public class TestGameController {
         int expectedStars = 4;
         int actualStars = GameController.stars.getNumOfStars();
         assertEquals("Check Number of Stars", expectedStars, actualStars);
+        
+        int expectedScore = 1;
+        int actualScore = GameController.getScore();
+        assertEquals("Check Score", expectedScore, actualScore);
     }
 
     @Test

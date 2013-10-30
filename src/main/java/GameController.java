@@ -11,11 +11,12 @@ public class GameController {
     static Stars                stars;
 
     private static int          maxNumOfStars;
+    private static int          score = 0;
 
-    protected final static char WALL = '#';
-    protected final static char HEAD = '@';
-    protected final static char BODY = '*';
-    protected final static char STAR = '+';
+    protected final static char WALL  = '#';
+    protected final static char HEAD  = '@';
+    protected final static char BODY  = '*';
+    protected final static char STAR  = '+';
 
     public static TextPoint initData(String textField, TextPoint snakeHead,
             Snake.Direction snakeDirection, int snakeSize, int numOfStars)
@@ -93,6 +94,7 @@ public class GameController {
         if (stars.isStar(head)) {
             snake.add();
             stars.remove(head);
+            score++;
         }
 
     }
@@ -129,6 +131,10 @@ public class GameController {
             snake.turn(Snake.Direction.RIGHT);
             break;
         }
+    }
+
+    public static int getScore() {
+        return score;
     }
 }
 

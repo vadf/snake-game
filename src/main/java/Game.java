@@ -1,11 +1,14 @@
+import java.awt.BorderLayout;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+
 import javax.swing.JFrame;
 import javax.swing.JTextArea;
+import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 
@@ -21,6 +24,7 @@ public class Game {
     public static String           textField;
     public static int              key                   = 0;
     public static boolean          move                  = false;
+    public static int              score                 = 0;
 
     public static void main(String[] args) {
         Timer t = new Timer(1000, new MoveTask());
@@ -44,6 +48,7 @@ public class Game {
                 if (move) {
                     GameController.move();
                     move = false;
+                    score = GameController.getScore();
                 }
 
                 // generate new star if needed
@@ -61,7 +66,9 @@ public class Game {
     public static void initGUI(int rows, int cols) {
         JFrame frame = new JFrame("Snake Game");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.add(new GameArea(rows, cols));
+
+        frame.add(new GameArea(rows, cols), BorderLayout.CENTER);
+        frame.add(new ScorePanel(cols), BorderLayout.SOUTH);
         frame.pack();
         frame.setVisible(true);
     }
@@ -98,6 +105,23 @@ class GameArea extends JTextArea implements KeyListener {
     @Override
     public void keyReleased(KeyEvent e) {
 
+    }
+}
+
+class ScorePanel extends JTextField {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 1519485961961948821L;
+
+    public ScorePanel(int cols) {
+        super(cols);
+        setFont(new Font("Courier", getFont().getStyle(), getFont().getSize()));
+    }
+
+    public void paintComponent(Graphics g) {
+        setText("Score " + Game.score);
+        super.paintComponent(g);
     }
 }
 
