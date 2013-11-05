@@ -14,17 +14,17 @@ import javax.swing.Timer;
 
 public class Game {
 
-    private static int             defaultSnakeSize      = 3;
-    private static Snake.Direction defaultSnakeDirection = Snake.Direction.RIGHT;
-    private static TextPoint       defaultSnakeHead      = new TextPoint(1, 5);
-    private static String          defaultField          = "src/main/resources/defaultField.txt";
-    private static int             defaultNumOfStars     = 3;
-    private static TextPoint       fieldSize;
+    private static int       defaultSnakeSize      = 3;
+    private static Direction defaultSnakeDirection = Direction.RIGHT;
+    private static TextPoint defaultSnakeHead      = new TextPoint(1, 5);
+    private static String    defaultField          = "src/main/resources/defaultField.txt";
+    private static int       defaultNumOfStars     = 3;
+    private static TextPoint fieldSize;
 
-    public static String           textField;
-    public static int              key                   = 0;
-    public static boolean          move                  = false;
-    public static int              score                 = 0;
+    public static String     textField;
+    public static int        key                   = 0;
+    public static boolean    move                  = false;
+    public static int        score                 = 0;
 
     public static void main(String[] args) {
         Timer t = new Timer(1000, new MoveTask());

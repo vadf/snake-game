@@ -22,7 +22,7 @@ public class TestGameController {
     public void testInitData() throws OutOfFieldException, IOException,
             SnakeOnWallException {
         int snakeSize = 3;
-        Snake.Direction snakeDirection = Snake.Direction.RIGHT;
+        Direction snakeDirection = Direction.RIGHT;
         TextPoint snakeHead = new TextPoint(1, 4);
         int numOfStars = 3;
         GameController.initData(testField, snakeHead, snakeDirection,
@@ -37,7 +37,7 @@ public class TestGameController {
     public void testInitData_HeadOnAWall() throws SnakeOnWallException,
             OutOfFieldException, IOException {
         int snakeSize = 3;
-        Snake.Direction snakeDirection = Snake.Direction.RIGHT;
+        Direction snakeDirection = Direction.RIGHT;
         TextPoint snakeHead = new TextPoint(1, 6);
         int numOfStars = 3;
         GameController.initData(testField, snakeHead, snakeDirection,
@@ -48,7 +48,7 @@ public class TestGameController {
     public void testInitData_HeadOutOfField() throws OutOfFieldException,
             IOException, SnakeOnWallException {
         int snakeSize = 3;
-        Snake.Direction snakeDirection = Snake.Direction.RIGHT;
+        Direction snakeDirection = Direction.RIGHT;
         TextPoint snakeHead = new TextPoint(2, 7);
         int numOfStars = 3;
         GameController.initData(testField, snakeHead, snakeDirection,
@@ -59,7 +59,7 @@ public class TestGameController {
     public void testToText() throws OutOfFieldException, IOException,
             SnakeOnWallException {
         int snakeSize = 3;
-        Snake.Direction snakeDirection = Snake.Direction.RIGHT;
+        Direction snakeDirection = Direction.RIGHT;
         TextPoint snakeHead = new TextPoint(1, 4);
         int numOfStars = 3;
         GameController.initData(testField, snakeHead, snakeDirection,
@@ -88,7 +88,7 @@ public class TestGameController {
     public void testMove() throws OutOfFieldException, IOException,
             SnakeOnWallException, SnakeAddException, SnakeCollision {
         int snakeSize = 3;
-        Snake.Direction snakeDirection = Snake.Direction.RIGHT;
+        Direction snakeDirection = Direction.RIGHT;
         TextPoint snakeHead = new TextPoint(1, 4);
         int numOfStars = 0;
         GameController.initData(testField, snakeHead, snakeDirection,
@@ -98,7 +98,7 @@ public class TestGameController {
         TextPoint actual = GameController.snake.getHead();
         TextPoint expected = new TextPoint(snakeHead.row, snakeHead.col + 1);
         assertEquals("Check Snake Head", expected, actual);
-        
+
         int expectedScore = 0;
         int actualScore = GameController.getScore();
         assertEquals("Check Score", expectedScore, actualScore);
@@ -108,7 +108,7 @@ public class TestGameController {
     public void testMoveOnWall() throws OutOfFieldException, IOException,
             SnakeOnWallException, SnakeAddException, SnakeCollision {
         int snakeSize = 3;
-        Snake.Direction snakeDirection = Snake.Direction.RIGHT;
+        Direction snakeDirection = Direction.RIGHT;
         TextPoint snakeHead = new TextPoint(1, 5);
         int numOfStars = 3;
         GameController.initData(testField, snakeHead, snakeDirection,
@@ -121,7 +121,7 @@ public class TestGameController {
     public void testMoveOnStar() throws OutOfFieldException, IOException,
             SnakeOnWallException, SnakeAddException, SnakeCollision {
         int snakeSize = 4;
-        Snake.Direction snakeDirection = Snake.Direction.RIGHT;
+        Direction snakeDirection = Direction.RIGHT;
         TextPoint snakeHead = new TextPoint(1, 4);
         int numOfStars = 5;
         GameController.initData(testField, snakeHead, snakeDirection,
@@ -139,7 +139,7 @@ public class TestGameController {
         int expectedStars = 4;
         int actualStars = GameController.stars.getNumOfStars();
         assertEquals("Check Number of Stars", expectedStars, actualStars);
-        
+
         int expectedScore = 1;
         int actualScore = GameController.getScore();
         assertEquals("Check Score", expectedScore, actualScore);
@@ -149,7 +149,7 @@ public class TestGameController {
     public void testNewStar() throws OutOfFieldException, IOException,
             SnakeOnWallException, SnakeAddException {
         int snakeSize = 4;
-        Snake.Direction snakeDirection = Snake.Direction.RIGHT;
+        Direction snakeDirection = Direction.RIGHT;
         TextPoint snakeHead = new TextPoint(1, 4);
         int numOfStars = 4;
         GameController.initData(testField, snakeHead, snakeDirection,
@@ -163,7 +163,7 @@ public class TestGameController {
     public void testNewStar_NoSpace() throws OutOfFieldException, IOException,
             SnakeOnWallException, SnakeAddException {
         int snakeSize = 4;
-        Snake.Direction snakeDirection = Snake.Direction.RIGHT;
+        Direction snakeDirection = Direction.RIGHT;
         TextPoint snakeHead = new TextPoint(1, 4);
         int numOfStars = 5;
         GameController.initData(testField, snakeHead, snakeDirection,

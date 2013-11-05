@@ -7,10 +7,10 @@ import org.junit.Before;
 import org.junit.Test;
 
 public class TestSnake {
-    private Snake           snake;
-    private int             snakeSize = 3;
-    private Snake.Direction direction = Snake.Direction.RIGHT;
-    private TextPoint       head      = new TextPoint(1, 5);
+    private Snake     snake;
+    private int       snakeSize = 3;
+    private Direction direction = Direction.RIGHT;
+    private TextPoint head      = new TextPoint(1, 5);
 
     @Before
     public void setUp() throws Exception {
@@ -86,7 +86,7 @@ public class TestSnake {
 
     @Test
     public void testTurnUp() throws SnakeCollision {
-        snake.turn(Snake.Direction.UP);
+        snake.turn(Direction.UP);
         snake.move();
 
         TextPoint expected = new TextPoint(head.row - 1, head.col);
@@ -96,7 +96,7 @@ public class TestSnake {
 
     @Test
     public void testTurnDown() throws SnakeCollision {
-        snake.turn(Snake.Direction.DOWN);
+        snake.turn(Direction.DOWN);
         snake.move();
 
         TextPoint expected = new TextPoint(head.row + 1, head.col);
@@ -106,8 +106,8 @@ public class TestSnake {
 
     @Test
     public void testTurnRight() throws SnakeCollision {
-        snake = new Snake(head, Snake.Direction.UP, snakeSize);
-        snake.turn(Snake.Direction.RIGHT);
+        snake = new Snake(head, Direction.UP, snakeSize);
+        snake.turn(Direction.RIGHT);
         snake.move();
 
         TextPoint expected = new TextPoint(head.row, head.col + 1);
@@ -117,8 +117,8 @@ public class TestSnake {
 
     @Test
     public void testTurnLeft() throws SnakeCollision {
-        snake = new Snake(head, Snake.Direction.UP, snakeSize);
-        snake.turn(Snake.Direction.LEFT);
+        snake = new Snake(head, Direction.UP, snakeSize);
+        snake.turn(Direction.LEFT);
         snake.move();
 
         TextPoint expected = new TextPoint(head.row, head.col - 1);
@@ -138,7 +138,7 @@ public class TestSnake {
 
     @Test
     public void testTurnOppositeDirection() throws SnakeCollision {
-        snake.turn(Snake.Direction.LEFT);
+        snake.turn(Direction.LEFT);
         snake.move();
 
         TextPoint expected = new TextPoint(head.row, head.col + 1);
@@ -161,16 +161,27 @@ public class TestSnake {
         snake.move();
         snake.add();
 
-        snake.turn(Snake.Direction.DOWN);
+        snake.turn(Direction.DOWN);
         snake.move();
         snake.add();
 
-        snake.turn(Snake.Direction.LEFT);
+        snake.turn(Direction.LEFT);
         snake.move();
         snake.add();
 
-        snake.turn(Snake.Direction.UP);
+        snake.turn(Direction.UP);
         snake.move(); // collision with snake body
         System.out.println(snake.getSnake() + "");
+    }
+
+    @Test
+    public void testChangeHead() throws SnakeCollision {
+        TextPoint newHead = new TextPoint(head.row + 2, head.col + 3);
+        snake.changeHeadPosition(newHead, Direction.DOWN);
+
+        snake.move();
+        TextPoint expected = new TextPoint(newHead.row + 1, newHead.col);
+        TextPoint actual = snake.getHead();
+        assertEquals("Check new Snake Head", expected, actual);
     }
 }

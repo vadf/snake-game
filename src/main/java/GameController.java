@@ -19,7 +19,7 @@ public class GameController {
     protected final static char STAR  = '+';
 
     public static TextPoint initData(String textField, TextPoint snakeHead,
-            Snake.Direction snakeDirection, int snakeSize, int numOfStars)
+            Direction snakeDirection, int snakeSize, int numOfStars)
             throws OutOfFieldException, IOException, SnakeOnWallException {
         field = new GameField(textField);
         if (field.isWall(snakeHead)) {
@@ -116,19 +116,19 @@ public class GameController {
         switch (key) {
         case KeyEvent.VK_UP:
         case KeyEvent.VK_W:
-            snake.turn(Snake.Direction.UP);
+            snake.turn(Direction.UP);
             break;
         case KeyEvent.VK_LEFT:
         case KeyEvent.VK_A:
-            snake.turn(Snake.Direction.LEFT);
+            snake.turn(Direction.LEFT);
             break;
         case KeyEvent.VK_DOWN:
         case KeyEvent.VK_S:
-            snake.turn(Snake.Direction.DOWN);
+            snake.turn(Direction.DOWN);
             break;
         case KeyEvent.VK_RIGHT:
         case KeyEvent.VK_D:
-            snake.turn(Snake.Direction.RIGHT);
+            snake.turn(Direction.RIGHT);
             break;
         }
     }

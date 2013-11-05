@@ -1,7 +1,7 @@
 import java.util.ArrayList;
 import java.util.List;
 
-public class Snake {
+public class Snake implements HeadMove {
     private List<TextPoint> snake  = new ArrayList<TextPoint>();
     private int             dirCol = 0;
     private int             dirRow = 0;
@@ -15,10 +15,6 @@ public class Snake {
                     - dirCol * i);
             snake.add(p);
         }
-    }
-
-    public enum Direction {
-        RIGHT, LEFT, UP, DOWN
     }
 
     public int getSize() {
@@ -86,6 +82,7 @@ public class Snake {
         tail = snake.remove(snake.size() - 1);
     }
 
+    @Override
     public TextPoint getHead() {
         return snake.get(0);
     }
@@ -93,6 +90,23 @@ public class Snake {
     public List<TextPoint> getSnake() {
         return new ArrayList<TextPoint>(snake);
     }
+
+    @Override
+    public void changeHeadPosition(TextPoint newHead, Direction newDirection) {
+        snake.remove(0);
+        snake.add(0, newHead);
+        turn(newDirection);
+    }
+}
+
+enum Direction {
+    RIGHT, LEFT, UP, DOWN
+}
+
+interface HeadMove {
+    public void changeHeadPosition(TextPoint newHead, Direction newDirection);
+
+    public TextPoint getHead();
 }
 
 class SnakeAddException extends Exception {
