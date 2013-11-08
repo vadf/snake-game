@@ -63,6 +63,21 @@ public class GameField {
         }
         return false;
     }
+
+    public boolean addWall(TextPoint p) throws OutOfFieldException {
+        if (isWall(p))
+            return false;
+        walls.add(p);
+        return true;
+    }
+
+    public boolean removeWall(TextPoint p) throws OutOfFieldException {
+        if (!isWall(p))
+            return false;
+        walls.remove(p);
+        return true;
+
+    }
 }
 
 class OutOfFieldException extends Exception {

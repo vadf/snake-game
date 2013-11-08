@@ -8,29 +8,49 @@ import org.junit.Before;
 import org.junit.Test;
 
 public class TestGameController {
-    private String testField = "src/test/resources/TestField.txt";
+    private GameController game;
+    private String         testField = "src/test/resources/TestField.txt";
 
     @Before
     public void setUp() throws Exception {
+        game = new GameController();
     }
 
     @After
     public void tearDown() throws Exception {
+        game = null;
     }
 
     @Test
-    public void testInitData() throws OutOfFieldException, IOException,
-            SnakeOnWallException {
+    public void testInitField() throws IOException {
+        TextPoint expected = new TextPoint(4, 7);
+        TextPoint actual = game.initField(testField);
+
+        assertNotNull("Check that GameController Field is initialized.",
+                game.field);
+        assertEquals("Check field size", expected, actual);
+
+    }
+
+    @Test
+    public void testInitAll() throws OutOfFieldException, IOException,
+            SnakeOnWallException, TeleportInitFailed {
         int snakeSize = 3;
         Direction snakeDirection = Direction.RIGHT;
         TextPoint snakeHead = new TextPoint(1, 4);
         int numOfStars = 3;
-        GameController.initData(testField, snakeHead, snakeDirection,
-                snakeSize, numOfStars);
-        assertNotNull("Check that GameController Field created.",
-                GameController.field);
-        assertNotNull("Check that Snake created.", GameController.snake);
-        assertNotNull("Check that Stars created.", GameController.stars);
+        TextPoint p1 = new TextPoint(1, 1);
+        TextPoint p2 = new TextPoint(2, 5);
+        Direction d1 = Direction.RIGHT;
+        Direction d2 = Direction.UP;
+
+        game.initField(testField);
+        game.initSnake(snakeHead, snakeDirection, snakeSize);
+        game.initPorts(p1, d1, p2, d2);
+        game.addStars(numOfStars);
+        assertNotNull("Check that GameController Field is initialized.",
+                game.field);
+        assertNotNull("Check that Snake is initialized.", game.snake);
     }
 
     @Test(expected = SnakeOnWallException.class)
@@ -39,9 +59,8 @@ public class TestGameController {
         int snakeSize = 3;
         Direction snakeDirection = Direction.RIGHT;
         TextPoint snakeHead = new TextPoint(1, 6);
-        int numOfStars = 3;
-        GameController.initData(testField, snakeHead, snakeDirection,
-                snakeSize, numOfStars);
+        game.initField(testField);
+        game.initSnake(snakeHead, snakeDirection, snakeSize);
     }
 
     @Test(expected = OutOfFieldException.class)
@@ -50,25 +69,57 @@ public class TestGameController {
         int snakeSize = 3;
         Direction snakeDirection = Direction.RIGHT;
         TextPoint snakeHead = new TextPoint(2, 7);
-        int numOfStars = 3;
-        GameController.initData(testField, snakeHead, snakeDirection,
-                snakeSize, numOfStars);
+        game.initField(testField);
+        game.initSnake(snakeHead, snakeDirection, snakeSize);
     }
 
     @Test
-    public void testToText() throws OutOfFieldException, IOException,
-            SnakeOnWallException {
+    public void testInit_PortOnWall() throws OutOfFieldException, IOException,
+            TeleportInitFailed {
+        TextPoint p1 = new TextPoint(1, 0);
+        TextPoint p2 = new TextPoint(2, 5);
+        Direction d1 = Direction.RIGHT;
+        Direction d2 = Direction.UP;
+
+        game.initField(testField);
+        game.initPorts(p1, d1, p2, d2);
+        int expected = 18;
+        int actual = game.field.getWalls().size();
+        assertEquals("Check number of walls", expected, actual);
+    }
+
+    @Test(expected = TeleportInitFailed.class)
+    public void testInit_PortDirectionNok() throws OutOfFieldException,
+            IOException, PortAddException, TeleportInitFailed {
+        TextPoint p1 = new TextPoint(1, 1);
+        TextPoint p2 = new TextPoint(2, 5);
+        Direction d1 = Direction.UP;
+        Direction d2 = Direction.UP;
+
+        game.initField(testField);
+        game.initPorts(p1, d1, p2, d2);
+    }
+
+    @Test
+    public void testToString() throws OutOfFieldException, IOException,
+            SnakeOnWallException, TeleportInitFailed {
         int snakeSize = 3;
         Direction snakeDirection = Direction.RIGHT;
         TextPoint snakeHead = new TextPoint(1, 4);
         int numOfStars = 3;
-        GameController.initData(testField, snakeHead, snakeDirection,
-                snakeSize, numOfStars);
+        TextPoint p1 = new TextPoint(1, 1);
+        TextPoint p2 = new TextPoint(2, 5);
+        Direction d1 = Direction.RIGHT;
+        Direction d2 = Direction.UP;
 
-        String textField = GameController.toText();
-        int expectedLength = GameController.field.getRowsNum()
-                * GameController.field.getColsNum()
-                + GameController.field.getRowsNum();
+        game.initField(testField);
+        game.initSnake(snakeHead, snakeDirection, snakeSize);
+        game.initPorts(p1, d1, p2, d2);
+        game.addStars(numOfStars);
+
+        String textField = game.toString();
+        int expectedLength = game.field.getRowsNum() * game.field.getColsNum()
+                + game.field.getRowsNum();
         int actualLength = textField.length();
         assertEquals("Check the length of Text Field.", expectedLength,
                 actualLength);
@@ -76,12 +127,15 @@ public class TestGameController {
         assertTrue("Check that Text Field contains '**@'",
                 textField.contains("**@"));
 
-        List<TextPoint> stars = GameController.stars.getStars();
+        List<TextPoint> stars = game.stars.getStars();
         for (TextPoint p : stars) {
-            char star = textField.charAt(p.row
-                    * GameController.field.getColsNum() + p.row + p.col);
+            char star = textField.charAt(p.row * game.field.getColsNum()
+                    + p.row + p.col);
             assertEquals("Check star.", '+', star);
         }
+
+        assertTrue("Check that Text Field contains '0'",
+                textField.contains("0"));
     }
 
     @Test
@@ -90,17 +144,16 @@ public class TestGameController {
         int snakeSize = 3;
         Direction snakeDirection = Direction.RIGHT;
         TextPoint snakeHead = new TextPoint(1, 4);
-        int numOfStars = 0;
-        GameController.initData(testField, snakeHead, snakeDirection,
-                snakeSize, numOfStars);
+        game.initField(testField);
+        game.initSnake(snakeHead, snakeDirection, snakeSize);
 
-        GameController.move();
-        TextPoint actual = GameController.snake.getHead();
+        game.move();
+        TextPoint actual = game.snake.getHead();
         TextPoint expected = new TextPoint(snakeHead.row, snakeHead.col + 1);
         assertEquals("Check Snake Head", expected, actual);
 
         int expectedScore = 0;
-        int actualScore = GameController.getScore();
+        int actualScore = game.getScore();
         assertEquals("Check Score", expectedScore, actualScore);
     }
 
@@ -110,11 +163,36 @@ public class TestGameController {
         int snakeSize = 3;
         Direction snakeDirection = Direction.RIGHT;
         TextPoint snakeHead = new TextPoint(1, 5);
-        int numOfStars = 3;
-        GameController.initData(testField, snakeHead, snakeDirection,
-                snakeSize, numOfStars);
+        game.initField(testField);
+        game.initSnake(snakeHead, snakeDirection, snakeSize);
 
-        GameController.move();
+        game.move();
+    }
+
+    @Test
+    public void testMoveOnPort() throws OutOfFieldException, IOException,
+            SnakeOnWallException, SnakeAddException, SnakeCollision,
+            TeleportInitFailed {
+        int snakeSize = 3;
+        Direction snakeDirection = Direction.RIGHT;
+        TextPoint snakeHead = new TextPoint(1, 4);
+        TextPoint p1 = new TextPoint(2, 1);
+        TextPoint p2 = new TextPoint(1, 5);
+        Direction d1 = Direction.UP;
+        Direction d2 = Direction.LEFT;
+
+        game.initField(testField);
+        game.initPorts(p1, d1, p2, d2);
+        game.initSnake(snakeHead, snakeDirection, snakeSize);
+
+        game.move();
+        TextPoint actual = game.snake.getHead();
+        assertEquals("Check new Head position", p1, actual);
+
+        game.move();
+        actual = game.snake.getHead();
+        TextPoint expected = new TextPoint(p1.row - 1, p1.col);
+        assertEquals("Check new Head position", expected, actual);
     }
 
     @Test
@@ -124,52 +202,67 @@ public class TestGameController {
         Direction snakeDirection = Direction.RIGHT;
         TextPoint snakeHead = new TextPoint(1, 4);
         int numOfStars = 5;
-        GameController.initData(testField, snakeHead, snakeDirection,
-                snakeSize, numOfStars);
+        game.initField(testField);
+        game.initSnake(snakeHead, snakeDirection, snakeSize);
+        game.addStars(numOfStars);
 
-        GameController.move();
-        TextPoint actualHead = GameController.snake.getHead();
+        game.move();
+        TextPoint actualHead = game.snake.getHead();
         TextPoint expectedHead = new TextPoint(snakeHead.row, snakeHead.col + 1);
         assertEquals("Check Snake Head", expectedHead, actualHead);
 
         int expectedSize = 5;
-        int actualSize = GameController.snake.getSize();
+        int actualSize = game.snake.getSize();
         assertEquals("Check Snake Size", expectedSize, actualSize);
 
         int expectedStars = 4;
-        int actualStars = GameController.stars.getNumOfStars();
+        int actualStars = game.stars.getNumOfStars();
         assertEquals("Check Number of Stars", expectedStars, actualStars);
 
         int expectedScore = 1;
-        int actualScore = GameController.getScore();
+        int actualScore = game.getScore();
         assertEquals("Check Score", expectedScore, actualScore);
     }
 
     @Test
-    public void testNewStar() throws OutOfFieldException, IOException,
-            SnakeOnWallException, SnakeAddException {
-        int snakeSize = 4;
+    public void testGetEmptyPointOk() throws OutOfFieldException, IOException,
+            SnakeOnWallException, SnakeAddException, TeleportInitFailed {
+        int snakeSize = 3;
         Direction snakeDirection = Direction.RIGHT;
         TextPoint snakeHead = new TextPoint(1, 4);
-        int numOfStars = 4;
-        GameController.initData(testField, snakeHead, snakeDirection,
-                snakeSize, numOfStars);
+        int numOfStars = 3;
+        TextPoint p1 = new TextPoint(1, 1);
+        TextPoint p2 = new TextPoint(2, 5);
+        Direction d1 = Direction.RIGHT;
+        Direction d2 = Direction.UP;
 
-        TextPoint star = GameController.newStar();
-        assertNotNull("Check that new Star is created", star);
+        game.initField(testField);
+        game.initSnake(snakeHead, snakeDirection, snakeSize);
+        game.initPorts(p1, d1, p2, d2);
+        game.addStars(numOfStars);
+
+        TextPoint p = game.getEmptyPoint();
+        assertNotNull("Check that empty point is found", p);
     }
 
     @Test
-    public void testNewStar_NoSpace() throws OutOfFieldException, IOException,
-            SnakeOnWallException, SnakeAddException {
-        int snakeSize = 4;
+    public void testGetEmptyPointNok() throws OutOfFieldException, IOException,
+            SnakeOnWallException, SnakeAddException, TeleportInitFailed {
+        int snakeSize = 3;
         Direction snakeDirection = Direction.RIGHT;
         TextPoint snakeHead = new TextPoint(1, 4);
-        int numOfStars = 5;
-        GameController.initData(testField, snakeHead, snakeDirection,
-                snakeSize, numOfStars);
+        int numOfStars = 4;
+        TextPoint p1 = new TextPoint(1, 1);
+        TextPoint p2 = new TextPoint(2, 5);
+        Direction d1 = Direction.RIGHT;
+        Direction d2 = Direction.UP;
 
-        TextPoint star = GameController.newStar();
-        assertNull("Check that new Star is not created", star);
+        game.initField(testField);
+        game.initSnake(snakeHead, snakeDirection, snakeSize);
+        game.initPorts(p1, d1, p2, d2);
+        game.addStars(numOfStars);
+
+        TextPoint p = game.getEmptyPoint();
+        assertNull("Check that there are no empty points", p);
     }
 }

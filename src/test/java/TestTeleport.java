@@ -32,12 +32,20 @@ public class TestTeleport {
     @Test
     public void testAddPortOk() {
         assertTrue("Check that new port is added", port.add(p3, right));
+
+        int expected = 3;
+        int actual = port.getNumOfPorts();
+        assertEquals("Check number of ports", expected, actual);
     }
 
     @Test
     public void testAddPortNok() {
         assertFalse("Check that new port is not added",
                 port.add(new TextPoint(p1), left));
+
+        int expected = 2;
+        int actual = port.getNumOfPorts();
+        assertEquals("Check number of ports", expected, actual);
     }
 
     @Test

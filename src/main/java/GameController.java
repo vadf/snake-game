@@ -6,56 +6,56 @@ import java.util.Random;
 
 public class GameController {
 
-    static Snake                snake;
-    static GameField            field;
-    static Stars                stars;
+    Snake                snake;
+    GameField            field;
+    Stars                stars         = new Stars();
+    Teleport[]           ports         = new Teleport[9];
 
-    private static int          maxNumOfStars;
-    private static int          score = 0;
+    private int          maxNumOfStars = 1;
+    private int          score         = 0;
 
-    protected final static char WALL  = '#';
-    protected final static char HEAD  = '@';
-    protected final static char BODY  = '*';
-    protected final static char STAR  = '+';
+    protected final char WALL          = '#';
+    protected final char HEAD          = '@';
+    protected final char BODY          = '*';
+    protected final char STAR          = '+';
 
-    public static TextPoint initData(String textField, TextPoint snakeHead,
-            Direction snakeDirection, int snakeSize, int numOfStars)
-            throws OutOfFieldException, IOException, SnakeOnWallException {
-        field = new GameField(textField);
-        if (field.isWall(snakeHead)) {
-            throw new SnakeOnWallException("Snake Head is on the Wall");
-        }
-        snake = new Snake(snakeHead, snakeDirection, snakeSize);
-        stars = new Stars();
-        for (int i = 0; i < numOfStars; i++) {
-            stars.add(newStar());
+    public TextPoint getEmptyPoint() throws OutOfFieldException {
+        int ports_size = 0;
+        for (int i = 0; i < ports.length; i++) {
+            if (ports[i] != null) {
+                ports_size += ports[i].getNumOfPorts();
+            }
         }
 
-        maxNumOfStars = numOfStars;
-        return new TextPoint(field.getRowsNum(), field.getColsNum());
-    }
+        if (field.getEffectiveSize() - snake.getSize()
+                - stars.getStars().size() - ports_size == 0) {
+            return null;
+        }
 
-    public static TextPoint newStar() throws OutOfFieldException {
         Random r = new Random(System.currentTimeMillis());
         int row = 0;
         int col = 0;
         TextPoint point = null;
+
         while (true) {
-            if (field.getEffectiveSize() - snake.getSize()
-                    - stars.getStars().size() == 0) {
-                break;
-            }
+            boolean isPort = false;
             row = r.nextInt(field.getRowsNum());
             col = r.nextInt(field.getColsNum());
             point = new TextPoint(row, col);
+            for (int i = 0; i < ports.length; i++) {
+                if (ports[i] != null && ports[i].isPort(point)) {
+                    isPort = true;
+                }
+            }
             if (!field.isWall(point) && !snake.isOnSnake(point)
-                    && !stars.isStar(point))
+                    && !stars.isStar(point) && !isPort)
                 break;
         }
         return point;
     }
 
-    public static String toText() {
+    @Override
+    public String toString() {
         List<TextPoint> wallsList = field.getWalls();
         List<TextPoint> snakeList = snake.getSnake();
         List<TextPoint> starsList = stars.getStars();
@@ -77,6 +77,15 @@ public class GameController {
         for (TextPoint p : starsList) {
             textField[p.row][p.col] = STAR;
         }
+
+        for (int i = 0; i < ports.length; i++) {
+            if (ports[i] != null) {
+                for (TextPoint p : ports[i].getPorts()) {
+                    textField[p.row][p.col] = (char) ('0' + i);
+                }
+            }
+        }
+
         StringBuilder str = new StringBuilder();
         for (int i = 0; i < textField.length; i++)
             str.append(textField[i]).append("\n");
@@ -84,7 +93,7 @@ public class GameController {
         return str.toString();
     }
 
-    public static void move() throws SnakeOnWallException, OutOfFieldException,
+    public void move() throws SnakeOnWallException, OutOfFieldException,
             SnakeAddException, SnakeCollision {
         snake.move();
         TextPoint head = snake.getHead();
@@ -97,12 +106,19 @@ public class GameController {
             score++;
         }
 
+        for (int i = 0; i < ports.length; i++) {
+            if (ports[i] != null && ports[i].isPort(head)) {
+                ports[i].updateHead(snake);
+                break;
+            }
+        }
+
     }
 
-    public static boolean checkAndCreateStar() throws OutOfFieldException {
+    public boolean checkAndCreateStar() throws OutOfFieldException {
         boolean result = false;
         if (stars.getNumOfStars() < maxNumOfStars) {
-            TextPoint newStar = newStar();
+            TextPoint newStar = getEmptyPoint();
             if (newStar == null) {
                 result = true;
             }
@@ -112,7 +128,7 @@ public class GameController {
         return result;
     }
 
-    public static void setDirection(int key) {
+    public void setDirection(int key) {
         switch (key) {
         case KeyEvent.VK_UP:
         case KeyEvent.VK_W:
@@ -133,8 +149,81 @@ public class GameController {
         }
     }
 
-    public static int getScore() {
+    public int getScore() {
         return score;
+    }
+
+    public TextPoint initField(String textField) throws IOException {
+        field = new GameField(textField);
+        return new TextPoint(field.getRowsNum(), field.getColsNum());
+    }
+
+    public void initSnake(TextPoint snakeHead, Direction snakeDirection,
+            int snakeSize) throws OutOfFieldException, SnakeOnWallException {
+        if (field.isWall(snakeHead)) {
+            throw new SnakeOnWallException("Snake Head is on the Wall");
+        }
+        snake = new Snake(snakeHead, snakeDirection, snakeSize);
+    }
+
+    public void addStars(int numOfStars) throws OutOfFieldException {
+        for (int i = 0; i < numOfStars; i++) {
+            stars.add(getEmptyPoint());
+        }
+        maxNumOfStars = numOfStars;
+    }
+
+    public void initPorts(TextPoint p1, Direction d1, TextPoint p2, Direction d2)
+            throws TeleportInitFailed, OutOfFieldException {
+        checkPortPosition(p1, d1);
+        checkPortPosition(p2, d2);
+
+        field.removeWall(p1);
+        field.removeWall(p2);
+        Teleport port = new Teleport(p1, d1, p2, d2);
+        for (int i = 0; i < ports.length; i++) {
+            if (ports[i] == null) {
+                ports[i] = port;
+                break;
+            }
+        }
+
+    }
+
+    private void checkPortPosition(TextPoint p, Direction d)
+            throws TeleportInitFailed {
+        int dirCol = 0;
+        int dirRow = 0;
+        switch (d) {
+        case RIGHT:
+            dirCol = 1;
+            dirRow = 0;
+            break;
+        case LEFT:
+            dirCol = -1;
+            dirRow = 0;
+            break;
+        case UP:
+            dirCol = 0;
+            dirRow = -1;
+            break;
+        case DOWN:
+            dirCol = 0;
+            dirRow = 1;
+            break;
+        default:
+            throw new TeleportInitFailed("Wrong port direction " + d);
+        }
+
+        TextPoint portOut = new TextPoint(p.row + dirRow, p.col + dirCol);
+        try {
+            if (field.isWall(portOut))
+                throw new TeleportInitFailed("Port " + p + " direction " + d
+                        + " is looking at the wall");
+        } catch (OutOfFieldException e) {
+            throw new TeleportInitFailed("Port " + p + " direction " + d
+                    + " is looking outside the field");
+        }
     }
 }
 
@@ -145,9 +234,25 @@ class SnakeOnWallException extends Exception {
     private static final long serialVersionUID = 1097078667154590888L;
 
     public SnakeOnWallException() {
+        super();
     }
 
     public SnakeOnWallException(String message) {
+        super(message);
+    }
+}
+
+class PortAddException extends Exception {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 743114839912596609L;
+
+    public PortAddException() {
+        super();
+    }
+
+    public PortAddException(String message) {
         super(message);
     }
 }

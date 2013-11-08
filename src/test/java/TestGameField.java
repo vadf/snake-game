@@ -50,9 +50,9 @@ public class TestGameField {
 
     @Test
     public void testGetWalls() {
-        int actual = 19;
+        int expected = 19;
         List<TextPoint> walls = field.getWalls();
-        int expected = walls.size();
+        int actual = walls.size();
         assertEquals("Check number of walls.", expected, actual);
     }
 
@@ -82,5 +82,57 @@ public class TestGameField {
         TextPoint p = new TextPoint(4, 0);
         boolean actual = field.isInField(p);
         assertFalse("Check number of columns.", actual);
+    }
+
+    @Test
+    public void testAddWallOk() throws OutOfFieldException {
+        TextPoint p = new TextPoint(1, 1);
+        boolean result = field.addWall(p);
+        assertTrue("Check that new wall is added.", result);
+        int expected = 20;
+        int actual = field.getWalls().size();
+        assertEquals("Check number of walls.", expected, actual);
+    }
+
+    @Test
+    public void testAddWallNok() throws OutOfFieldException {
+        TextPoint p = new TextPoint(0, 0);
+        boolean result = field.addWall(p);
+        assertFalse("Check that new wall is not added.", result);
+        int expected = 19;
+        int actual = field.getWalls().size();
+        assertEquals("Check number of walls.", expected, actual);
+    }
+
+    @Test(expected = OutOfFieldException.class)
+    public void testAddWallException() throws OutOfFieldException {
+        TextPoint p = new TextPoint(-1, 0);
+        field.addWall(p);
+    }
+
+    @Test
+    public void testRemoveWallOk() throws OutOfFieldException {
+        TextPoint p = new TextPoint(0, 2);
+        boolean result = field.removeWall(p);
+        assertTrue("Check that new wall is added.", result);
+        int expected = 18;
+        int actual = field.getWalls().size();
+        assertEquals("Check number of walls.", expected, actual);
+    }
+
+    @Test
+    public void testRemoveWallNok() throws OutOfFieldException {
+        TextPoint p = new TextPoint(2, 2);
+        boolean result = field.removeWall(p);
+        assertFalse("Check that new wall is not added.", result);
+        int expected = 19;
+        int actual = field.getWalls().size();
+        assertEquals("Check number of walls.", expected, actual);
+    }
+
+    @Test(expected = OutOfFieldException.class)
+    public void testRemoveWallException() throws OutOfFieldException {
+        TextPoint p = new TextPoint(-1, 0);
+        field.removeWall(p);
     }
 }

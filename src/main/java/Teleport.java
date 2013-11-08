@@ -1,7 +1,7 @@
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Random;
-import java.util.Set;
 
 public class Teleport {
     private HashMap<TextPoint, Direction> ports = new HashMap<TextPoint, Direction>();
@@ -34,9 +34,8 @@ public class Teleport {
         }
 
         Random r = new Random(System.currentTimeMillis());
-        Set<TextPoint> keySet = ports.keySet();
-        keySet.remove(head);
-        ArrayList<TextPoint> keys = new ArrayList<TextPoint>(keySet);
+        ArrayList<TextPoint> keys = new ArrayList<TextPoint>(ports.keySet());
+        keys.remove(head);
         TextPoint newHead = keys.get(r.nextInt(keys.size()));
 
         snake.changeHeadPosition(newHead, ports.get(newHead));
@@ -45,6 +44,14 @@ public class Teleport {
     @Override
     public String toString() {
         return ports.toString();
+    }
+
+    protected List<TextPoint> getPorts() {
+        return new ArrayList<TextPoint>(ports.keySet());
+    }
+
+    public int getNumOfPorts() {
+        return ports.keySet().size();
     }
 }
 

@@ -19,7 +19,10 @@ public class Game {
     private static TextPoint defaultSnakeHead      = new TextPoint(1, 5);
     private static String    defaultField          = "src/main/resources/defaultField.txt";
     private static int       defaultNumOfStars     = 3;
-    private static TextPoint fieldSize;
+    private static TextPoint defaultP1             = new TextPoint(1, 1);
+    private static Direction defaultD1             = Direction.RIGHT;
+    private static TextPoint defaultP2             = new TextPoint(9, 17);
+    private static Direction defaultD2             = Direction.UP;
 
     public static String     textField;
     public static int        key                   = 0;
@@ -28,9 +31,14 @@ public class Game {
 
     public static void main(String[] args) {
         Timer t = new Timer(1000, new MoveTask());
+        GameController game = new GameController();
         try {
-            fieldSize = GameController.initData(defaultField, defaultSnakeHead,
-                    defaultSnakeDirection, defaultSnakeSize, defaultNumOfStars);
+            final TextPoint fieldSize = game.initField(defaultField);
+            game.initSnake(defaultSnakeHead, defaultSnakeDirection,
+                    defaultSnakeSize);
+            game.initPorts(defaultP1, defaultD1, defaultP2, defaultD2);
+            game.addStars(defaultNumOfStars);
+
             SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
                     initGUI(fieldSize.row, fieldSize.col);
@@ -39,20 +47,21 @@ public class Game {
 
             t.start();
             while (true) {
-                textField = GameController.toText();
+                textField = game.toString();
 
                 // read key and turn
-                GameController.setDirection(key);
+                game.setDirection(key);
+                key = 0;
 
                 // move snake and check
                 if (move) {
-                    GameController.move();
+                    game.move();
                     move = false;
-                    score = GameController.getScore();
+                    score = game.getScore();
                 }
 
                 // generate new star if needed
-                if (GameController.checkAndCreateStar()) {
+                if (game.checkAndCreateStar()) {
                     System.out.println("Congratulations");
                     break;
                 }
