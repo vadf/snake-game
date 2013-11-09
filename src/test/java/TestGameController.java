@@ -34,7 +34,7 @@ public class TestGameController {
 
     @Test
     public void testInitAll() throws OutOfFieldException, IOException,
-            SnakeOnWallException, TeleportInitFailed {
+            SnakeOnWallException, TeleportInitException {
         int snakeSize = 3;
         Direction snakeDirection = Direction.RIGHT;
         TextPoint snakeHead = new TextPoint(1, 4);
@@ -75,7 +75,7 @@ public class TestGameController {
 
     @Test
     public void testInit_PortOnWall() throws OutOfFieldException, IOException,
-            TeleportInitFailed {
+            TeleportInitException {
         TextPoint p1 = new TextPoint(1, 0);
         TextPoint p2 = new TextPoint(2, 5);
         Direction d1 = Direction.RIGHT;
@@ -88,9 +88,9 @@ public class TestGameController {
         assertEquals("Check number of walls", expected, actual);
     }
 
-    @Test(expected = TeleportInitFailed.class)
+    @Test(expected = TeleportInitException.class)
     public void testInit_PortDirectionNok() throws OutOfFieldException,
-            IOException, PortAddException, TeleportInitFailed {
+            IOException, PortAddException, TeleportInitException {
         TextPoint p1 = new TextPoint(1, 1);
         TextPoint p2 = new TextPoint(2, 5);
         Direction d1 = Direction.UP;
@@ -101,8 +101,46 @@ public class TestGameController {
     }
 
     @Test
+    public void testInit_2Teleports() throws OutOfFieldException, IOException,
+            PortAddException, TeleportInitException {
+        TextPoint p1 = new TextPoint(1, 1);
+        TextPoint p2 = new TextPoint(2, 5);
+        Direction d1 = Direction.RIGHT;
+        Direction d2 = Direction.UP;
+
+        TextPoint p3 = new TextPoint(1, 2);
+        TextPoint p4 = new TextPoint(1, 4);
+        Direction d3 = Direction.DOWN;
+        Direction d4 = Direction.DOWN;
+
+        game.initField(testField);
+        game.initPorts(p1, d1, p2, d2);
+        game.initPorts(p3, d3, p4, d4);
+        assertNotNull("Check that ports 0 created.", game.ports[0]);
+        assertNotNull("Check that ports 1 created.", game.ports[1]);
+    }
+
+    @Test(expected = TeleportInitException.class)
+    public void testInit_2SamePorts() throws OutOfFieldException, IOException,
+            PortAddException, TeleportInitException {
+        TextPoint p1 = new TextPoint(1, 1);
+        TextPoint p2 = new TextPoint(2, 5);
+        Direction d1 = Direction.RIGHT;
+        Direction d2 = Direction.UP;
+
+        TextPoint p3 = new TextPoint(p1);
+        TextPoint p4 = new TextPoint(1, 4);
+        Direction d3 = Direction.DOWN;
+        Direction d4 = Direction.DOWN;
+
+        game.initField(testField);
+        game.initPorts(p1, d1, p2, d2);
+        game.initPorts(p3, d3, p4, d4);
+    }
+
+    @Test
     public void testToString() throws OutOfFieldException, IOException,
-            SnakeOnWallException, TeleportInitFailed {
+            SnakeOnWallException, TeleportInitException {
         int snakeSize = 3;
         Direction snakeDirection = Direction.RIGHT;
         TextPoint snakeHead = new TextPoint(1, 4);
@@ -172,7 +210,7 @@ public class TestGameController {
     @Test
     public void testMoveOnPort() throws OutOfFieldException, IOException,
             SnakeOnWallException, SnakeAddException, SnakeCollision,
-            TeleportInitFailed {
+            TeleportInitException {
         int snakeSize = 3;
         Direction snakeDirection = Direction.RIGHT;
         TextPoint snakeHead = new TextPoint(1, 4);
@@ -226,7 +264,7 @@ public class TestGameController {
 
     @Test
     public void testGetEmptyPointOk() throws OutOfFieldException, IOException,
-            SnakeOnWallException, SnakeAddException, TeleportInitFailed {
+            SnakeOnWallException, SnakeAddException, TeleportInitException {
         int snakeSize = 3;
         Direction snakeDirection = Direction.RIGHT;
         TextPoint snakeHead = new TextPoint(1, 4);
@@ -247,7 +285,7 @@ public class TestGameController {
 
     @Test
     public void testGetEmptyPointNok() throws OutOfFieldException, IOException,
-            SnakeOnWallException, SnakeAddException, TeleportInitFailed {
+            SnakeOnWallException, SnakeAddException, TeleportInitException {
         int snakeSize = 3;
         Direction snakeDirection = Direction.RIGHT;
         TextPoint snakeHead = new TextPoint(1, 4);

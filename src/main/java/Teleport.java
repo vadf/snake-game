@@ -7,9 +7,9 @@ public class Teleport {
     private HashMap<TextPoint, Direction> ports = new HashMap<TextPoint, Direction>();
 
     public Teleport(TextPoint p1, Direction d1, TextPoint p2, Direction d2)
-            throws TeleportInitFailed {
+            throws TeleportInitException {
         if (p1.equals(p2))
-            throw new TeleportInitFailed("Initial Teleport points are equal.");
+            throw new TeleportInitException("Initial Teleport points are equal.");
         ports.put(p1, d1);
         ports.put(p2, d2);
     }
@@ -55,17 +55,17 @@ public class Teleport {
     }
 }
 
-class TeleportInitFailed extends Exception {
+class TeleportInitException extends Exception {
     /**
      * 
      */
     private static final long serialVersionUID = 9017525059536876319L;
 
-    public TeleportInitFailed() {
+    public TeleportInitException() {
         super();
     }
 
-    public TeleportInitFailed(String message) {
+    public TeleportInitException(String message) {
         super(message);
     }
 

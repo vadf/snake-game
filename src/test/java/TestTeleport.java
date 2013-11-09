@@ -24,8 +24,8 @@ public class TestTeleport {
         port = null;
     }
 
-    @Test(expected = TeleportInitFailed.class)
-    public void testTeleport() throws TeleportInitFailed {
+    @Test(expected = TeleportInitException.class)
+    public void testTeleport() throws TeleportInitException {
         new Teleport(p1, right, new TextPoint(p1), up);
     }
 

@@ -19,6 +19,17 @@ public class GameController {
     protected final char BODY          = '*';
     protected final char STAR          = '+';
 
+    private boolean isPort(TextPoint point) {
+        boolean isPort = false;
+        for (int i = 0; i < ports.length; i++) {
+            if (ports[i] != null && ports[i].isPort(point)) {
+                isPort = true;
+            }
+        }
+        return isPort;
+
+    }
+
     public TextPoint getEmptyPoint() throws OutOfFieldException {
         int ports_size = 0;
         for (int i = 0; i < ports.length; i++) {
@@ -38,17 +49,12 @@ public class GameController {
         TextPoint point = null;
 
         while (true) {
-            boolean isPort = false;
+
             row = r.nextInt(field.getRowsNum());
             col = r.nextInt(field.getColsNum());
             point = new TextPoint(row, col);
-            for (int i = 0; i < ports.length; i++) {
-                if (ports[i] != null && ports[i].isPort(point)) {
-                    isPort = true;
-                }
-            }
             if (!field.isWall(point) && !snake.isOnSnake(point)
-                    && !stars.isStar(point) && !isPort)
+                    && !stars.isStar(point) && !isPort(point))
                 break;
         }
         return point;
@@ -174,7 +180,7 @@ public class GameController {
     }
 
     public void initPorts(TextPoint p1, Direction d1, TextPoint p2, Direction d2)
-            throws TeleportInitFailed, OutOfFieldException {
+            throws TeleportInitException, OutOfFieldException {
         checkPortPosition(p1, d1);
         checkPortPosition(p2, d2);
 
@@ -191,7 +197,7 @@ public class GameController {
     }
 
     private void checkPortPosition(TextPoint p, Direction d)
-            throws TeleportInitFailed {
+            throws TeleportInitException {
         int dirCol = 0;
         int dirRow = 0;
         switch (d) {
@@ -212,17 +218,21 @@ public class GameController {
             dirRow = 1;
             break;
         default:
-            throw new TeleportInitFailed("Wrong port direction " + d);
+            throw new TeleportInitException("Wrong port direction " + d);
         }
 
         TextPoint portOut = new TextPoint(p.row + dirRow, p.col + dirCol);
         try {
             if (field.isWall(portOut))
-                throw new TeleportInitFailed("Port " + p + " direction " + d
+                throw new TeleportInitException("Port " + p + " direction " + d
                         + " is looking at the wall");
         } catch (OutOfFieldException e) {
-            throw new TeleportInitFailed("Port " + p + " direction " + d
+            throw new TeleportInitException("Port " + p + " direction " + d
                     + " is looking outside the field");
+        }
+
+        if (isPort(p)) {
+            throw new TeleportInitException("Port " + p + " is already exists");
         }
     }
 }
