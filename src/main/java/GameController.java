@@ -30,7 +30,7 @@ public class GameController {
 
     }
 
-    public TextPoint getEmptyPoint() throws OutOfFieldException {
+    public TextPoint getEmptyPoint() {
         int ports_size = 0;
         for (int i = 0; i < ports.length; i++) {
             if (ports[i] != null) {
@@ -38,8 +38,7 @@ public class GameController {
             }
         }
 
-        if (field.getEffectiveSize() - snake.getSize()
-                - stars.getStars().size() - ports_size == 0) {
+        if (field.getEffectiveSize() - snake.getSize() - stars.getStars().size() - ports_size == 0) {
             return null;
         }
 
@@ -48,14 +47,19 @@ public class GameController {
         int col = 0;
         TextPoint point = null;
 
-        while (true) {
+        try {
+            while (true) {
+                row = r.nextInt(field.getRowsNum());
+                col = r.nextInt(field.getColsNum());
+                point = new TextPoint(row, col);
 
-            row = r.nextInt(field.getRowsNum());
-            col = r.nextInt(field.getColsNum());
-            point = new TextPoint(row, col);
-            if (!field.isWall(point) && !snake.isOnSnake(point)
-                    && !stars.isStar(point) && !isPort(point))
-                break;
+                if (!field.isWall(point) && !snake.isOnSnake(point) && !stars.isStar(point)
+                        && !isPort(point))
+                    break;
+            }
+        } catch (OutOfFieldException e) {
+            System.out.println("This should not happen :)");
+            System.out.println(e.getMessage());
         }
         return point;
     }
@@ -99,8 +103,8 @@ public class GameController {
         return str.toString();
     }
 
-    public void move() throws SnakeOnWallException, OutOfFieldException,
-            SnakeAddException, SnakeCollision {
+    public void move() throws SnakeOnWallException, OutOfFieldException, SnakeAddException,
+            SnakeCollision {
         snake.move();
         TextPoint head = snake.getHead();
         if (field.isWall(head)) {
@@ -164,15 +168,19 @@ public class GameController {
         return new TextPoint(field.getRowsNum(), field.getColsNum());
     }
 
-    public void initSnake(TextPoint snakeHead, Direction snakeDirection,
-            int snakeSize) throws OutOfFieldException, SnakeOnWallException {
-        if (field.isWall(snakeHead)) {
-            throw new SnakeOnWallException("Snake Head is on the Wall");
-        }
+    public void initSnake(TextPoint snakeHead, Direction snakeDirection, int snakeSize)
+            throws OutOfFieldException, SnakeOnWallException {
+
         snake = new Snake(snakeHead, snakeDirection, snakeSize);
+        for (TextPoint p : snake.getSnake()) {
+            if (field.isWall(p)) {
+                throw new SnakeOnWallException("Snake point " + snake.getSnake().indexOf(p) + ":"
+                        + p + " is on the Wall");
+            }
+        }
     }
 
-    public void addStars(int numOfStars) throws OutOfFieldException {
+    public void addStars(int numOfStars) {
         for (int i = 0; i < numOfStars; i++) {
             stars.add(getEmptyPoint());
         }
@@ -193,11 +201,9 @@ public class GameController {
                 break;
             }
         }
-
     }
 
-    private void checkPortPosition(TextPoint p, Direction d)
-            throws TeleportInitException {
+    private void checkPortPosition(TextPoint p, Direction d) throws TeleportInitException {
         int dirCol = 0;
         int dirRow = 0;
         switch (d) {
