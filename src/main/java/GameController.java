@@ -66,26 +66,32 @@ public class GameController {
 
     @Override
     public String toString() {
-        List<TextPoint> wallsList = field.getWalls();
-        List<TextPoint> snakeList = snake.getSnake();
-        List<TextPoint> starsList = stars.getStars();
         char[][] textField = new char[field.getRowsNum()][field.getColsNum()];
         for (int i = 0; i < textField.length; i++) {
             Arrays.fill(textField[i], ' ');
         }
 
-        for (TextPoint p : wallsList) {
-            textField[p.row][p.col] = WALL;
+        if (field != null) {
+            List<TextPoint> wallsList = field.getWalls();
+            for (TextPoint p : wallsList) {
+                textField[p.row][p.col] = WALL;
+            }
         }
 
-        for (TextPoint p : snakeList) {
-            textField[p.row][p.col] = BODY;
+        if (snake != null) {
+            List<TextPoint> snakeList = snake.getSnake();
+            for (TextPoint p : snakeList) {
+                textField[p.row][p.col] = BODY;
+            }
+            TextPoint head = snake.getHead();
+            textField[head.row][head.col] = HEAD;
         }
-        TextPoint head = snake.getHead();
-        textField[head.row][head.col] = HEAD;
 
-        for (TextPoint p : starsList) {
-            textField[p.row][p.col] = STAR;
+        if (stars != null) {
+            List<TextPoint> starsList = stars.getStars();
+            for (TextPoint p : starsList) {
+                textField[p.row][p.col] = STAR;
+            }
         }
 
         for (int i = 0; i < ports.length; i++) {

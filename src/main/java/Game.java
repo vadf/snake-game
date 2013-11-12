@@ -1,7 +1,6 @@
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.Font;
-import java.awt.Graphics;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -19,7 +18,6 @@ import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JSlider;
 import javax.swing.JTextArea;
-import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
@@ -37,13 +35,12 @@ public class Game {
     static TextPoint              defaultP2             = new TextPoint(9, 17);
     static Direction              defaultD2             = Direction.UP;
 
-    private String                textField;
-    private int                   score                 = 0;
-
     private static GameController gameController;
     private TextPoint             fieldSize;
     private JFrame                frame;
     private Timer                 t;
+    private GameArea              gameArea;
+    private JLabel                score, status;
 
     public static void main(String[] args) {
 
@@ -62,8 +59,16 @@ public class Game {
     }
 
     public void initGameField(int rows, int cols) {
-        frame.add(new GameArea(rows, cols), BorderLayout.CENTER);
-        frame.add(new ScorePanel(cols), BorderLayout.SOUTH);
+        gameArea = new GameArea(rows, cols);
+        // gameArea.setText(gameController.toString());
+        frame.add(gameArea, BorderLayout.CENTER);
+
+        score = new JLabel("Score " + gameController.getScore());
+        frame.add(score, BorderLayout.SOUTH);
+        
+        status = new JLabel("Load game");
+        frame.add(status, BorderLayout.NORTH);
+        
         frame.pack();
     }
 
@@ -90,6 +95,9 @@ public class Game {
         btnStart.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                gameArea.setText(gameController.toString());
+                gameArea.requestFocusInWindow();
+                status.setText("Playing");
                 t.start();
             }
         });
@@ -98,6 +106,7 @@ public class Game {
             @Override
             public void actionPerformed(ActionEvent e) {
                 t.stop();
+                status.setText("Game paused");
             }
         });
 
@@ -117,7 +126,6 @@ public class Game {
         frame.add(pLoad, BorderLayout.EAST);
         frame.pack();
         frame.setVisible(true);
-
     }
 
     class DefaultGame implements ActionListener {
@@ -126,14 +134,13 @@ public class Game {
         public void actionPerformed(ActionEvent e) {
             try {
                 fieldSize = gameController.initField(defaultField);
-                gameController.initSnake(defaultSnakeHead,
-                        defaultSnakeDirection, defaultSnakeSize);
-                gameController.initPorts(defaultP1, defaultD1, defaultP2,
-                        defaultD2);
+                gameController.initSnake(defaultSnakeHead, defaultSnakeDirection, defaultSnakeSize);
+                gameController.initPorts(defaultP1, defaultD1, defaultP2, defaultD2);
                 gameController.addStars(defaultNumOfStars);
                 initGameField(fieldSize.row, fieldSize.col);
             } catch (IOException | OutOfFieldException | SnakeOnWallException
                     | TeleportInitException e1) {
+                status.setText("Load failed: " + e1.getMessage());
                 System.err.println(e1.getMessage());
             }
         }
@@ -147,12 +154,14 @@ public class Game {
             if (fileopen.showDialog(frame, "Open") == JFileChooser.APPROVE_OPTION) {
                 File file = fileopen.getSelectedFile();
                 try {
-                    fieldSize = gameController
-                            .initField(file.getAbsolutePath());
+                    fieldSize = gameController.initField(file.getAbsolutePath());
                     initGameField(fieldSize.row, fieldSize.col);
                     new SnakeParams();
+                    gameArea.setText(gameController.toString());
                     new StarsParams();
+                    gameArea.setText(gameController.toString());
                 } catch (IOException e1) {
+                    status.setText("Load failed: " + e1.getMessage());
                     System.err.println(e1.getMessage());
                 }
             }
@@ -167,15 +176,9 @@ public class Game {
 
         public GameArea(int rows, int cols) {
             super(rows, cols);
-            setFont(new Font("Courier", getFont().getStyle(), getFont()
-                    .getSize()));
+            setFont(new Font("Courier", getFont().getStyle(), getFont().getSize()));
             setFocusable(true);
             addKeyListener(this);
-        }
-
-        public void paintComponent(Graphics g) {
-            setText(textField);
-            super.paintComponent(g);
         }
 
         @Override
@@ -194,24 +197,6 @@ public class Game {
         }
     }
 
-    class ScorePanel extends JTextField {
-        /**
-         * 
-         */
-        private static final long serialVersionUID = 1519485961961948821L;
-
-        public ScorePanel(int cols) {
-            super(cols);
-            setFont(new Font("Courier", getFont().getStyle(), getFont()
-                    .getSize()));
-        }
-
-        public void paintComponent(Graphics g) {
-            setText("Score " + score);
-            super.paintComponent(g);
-        }
-    }
-
     class MoveTask implements ActionListener {
 
         @Override
@@ -221,74 +206,67 @@ public class Game {
                 gameController.move();
                 // generate new star if needed
                 if (gameController.checkAndCreateStar()) {
+                    status.setText("Congratulations, You Win");
                     System.out.println("Congratulations");
                     t.stop();
                 }
-            } catch (SnakeOnWallException | OutOfFieldException
-                    | SnakeAddException | SnakeCollision e1) {
+                gameArea.setText(gameController.toString());
+            } catch (SnakeOnWallException | OutOfFieldException | SnakeAddException
+                    | SnakeCollision e1) {
+                status.setText("Game over: " + e1.getMessage());
                 System.err.println(e1.getMessage());
                 t.stop();
             }
-            score = gameController.getScore();
-            textField = gameController.toString();
+            score.setText("Score " + gameController.getScore());
+            ;
         }
     }
 
     class SnakeParams extends JDialog {
+        int                       caret            = 0;
         /**
          * 
          */
         private static final long serialVersionUID = 4032564486821545199L;
 
         public SnakeParams() {
+            super();
             setLayout(new BoxLayout(getContentPane(), BoxLayout.Y_AXIS));
 
-            add(new JLabel("Select Snake Head: row"));
-            int max_size = gameController.field.getRowsNum() - 1;
-            final JSlider sliderRow = new JSlider(SwingConstants.HORIZONTAL, 0,
-                    max_size, 5);
-            sliderRow.setMinorTickSpacing(1);
-            sliderRow.setMajorTickSpacing(5);
-            sliderRow.setPaintTicks(true);
-            sliderRow.setPaintLabels(true);
-            add(sliderRow);
+            add(new JLabel("Set Snake Head initial position"));
+            final GameArea tmp = new GameArea(fieldSize.row, fieldSize.col);
+            tmp.setText(gameController.toString());
+            add(tmp);
 
-            add(new JLabel("Select Snake Head: col"));
-            max_size = gameController.field.getColsNum() - 1;
-            final JSlider sliderCol = new JSlider(SwingConstants.HORIZONTAL, 0,
-                    max_size, 5);
-            sliderCol.setMinorTickSpacing(1);
-            sliderCol.setMajorTickSpacing(5);
-            sliderCol.setPaintTicks(true);
-            sliderCol.setPaintLabels(true);
-            add(sliderCol);
+            // add(new JLabel("Select Snake Head: row"));
+            // int max_size = gameController.field.getRowsNum() - 1;
+            // final ParamSlider sliderRow = new ParamSlider(0, max_size, 5);
+            // add(sliderRow);
+            //
+            // add(new JLabel("Select Snake Head: col"));
+            // max_size = gameController.field.getColsNum() - 1;
+            // final ParamSlider sliderCol = new ParamSlider(0, max_size, 5);
+            // add(sliderCol);
 
             add(new JLabel("Select Snake size"));
-            max_size = 3 + gameController.field.getEffectiveSize() / 30;
-            final JSlider sliderSize = new JSlider(SwingConstants.HORIZONTAL,
-                    1, max_size, 3);
-            sliderSize.setMinorTickSpacing(1);
-            sliderSize.setMajorTickSpacing(3);
-            sliderSize.setPaintTicks(true);
-            sliderSize.setPaintLabels(true);
+            int max_size = 3 + gameController.field.getEffectiveSize() / 30;
+            final ParamSlider sliderSize = new ParamSlider(1, max_size, 3);
             add(sliderSize);
 
             add(new JLabel("Select Snake direction"));
-            final JList<Direction> list = new JList<Direction>(
-                    Direction.values());
-            list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-            list.setSelectedIndex(0);
+            final ParamDirection list = new ParamDirection();
             add(list);
 
             JButton btnSave = new JButton("Save");
             btnSave.addActionListener(new ActionListener() {
-
                 @Override
                 public void actionPerformed(ActionEvent e) {
                     try {
-                        gameController.initSnake(
-                                new TextPoint(sliderRow.getValue(), sliderCol
-                                        .getValue()), list.getSelectedValue(),
+                        caret = tmp.getCaretPosition();
+                        int row = caret / (fieldSize.col + 1);
+                        int col = caret % (fieldSize.col + 1);
+
+                        gameController.initSnake(new TextPoint(row, col), list.getSelectedValue(),
                                 sliderSize.getValue());
                         dispose();
                     } catch (OutOfFieldException | SnakeOnWallException e1) {
@@ -296,9 +274,7 @@ public class Game {
                                 .println("Snake Init Failed. Please select another Snake params.");
                         System.err.println(e1.getMessage());
                     }
-
                 }
-
             });
             add(btnSave);
 
@@ -319,27 +295,21 @@ public class Game {
         private static final long serialVersionUID = 1L;
 
         public StarsParams() {
+            super();
             setLayout(new BoxLayout(getContentPane(), BoxLayout.Y_AXIS));
 
             add(new JLabel("Sel number of Stars"));
             int max_size = 5 + gameController.field.getEffectiveSize() / 20;
-            final JSlider slider = new JSlider(SwingConstants.HORIZONTAL, 0,
-                    max_size, 3);
-            slider.setMinorTickSpacing(1);
-            slider.setMajorTickSpacing(5);
-            slider.setPaintTicks(true);
-            slider.setPaintLabels(true);
+            final ParamSlider slider = new ParamSlider(1, max_size, 5);
             add(slider);
 
             JButton btnSave = new JButton("Save");
             btnSave.addActionListener(new ActionListener() {
-
                 @Override
                 public void actionPerformed(ActionEvent e) {
                     gameController.addStars(slider.getValue());
                     dispose();
                 }
-
             });
             add(btnSave);
 
@@ -350,6 +320,34 @@ public class Game {
             setDefaultCloseOperation(DISPOSE_ON_CLOSE);
             setLocationRelativeTo(null);
             setVisible(true);
+        }
+    }
+
+    class ParamSlider extends JSlider {
+        /**
+         * 
+         */
+        private static final long serialVersionUID = -6772332188129643119L;
+
+        public ParamSlider(int min, int max, int cur) {
+            super(SwingConstants.HORIZONTAL, min, max, cur);
+            setMinorTickSpacing(1);
+            setMajorTickSpacing(cur);
+            setPaintTicks(true);
+            setPaintLabels(true);
+        }
+    }
+
+    class ParamDirection extends JList<Direction> {
+        /**
+         * 
+         */
+        private static final long serialVersionUID = -3257361818985306762L;
+
+        public ParamDirection() {
+            setListData(Direction.values());
+            setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+            setSelectedIndex(0);
         }
     }
 }
