@@ -2,17 +2,30 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Snake implements HeadMove {
-    private List<TextPoint> snake  = new ArrayList<TextPoint>();
-    private int             dirCol = 0;
-    private int             dirRow = 0;
+    private List<TextPoint> snake = new ArrayList<TextPoint>();
     private TextPoint       tail;
+    private Direction       direction;
 
     public Snake(TextPoint head, Direction direction, int snakeSize) {
+        Direction oposite = Direction.RIGHT;
+        switch (direction) {
+        case RIGHT:
+            oposite = Direction.LEFT;
+            break;
+        case LEFT:
+            oposite = Direction.RIGHT;
+            break;
+        case UP:
+            oposite = Direction.DOWN;
+            break;
+        case DOWN:
+            oposite = Direction.UP;
+            break;
+        }
         snake.add(head);
         turn(direction);
         for (int i = 1; i < snakeSize; i++) {
-            TextPoint p = new TextPoint(head.row - dirRow * i, head.col
-                    - dirCol * i);
+            TextPoint p = snake.get(i - 1).move(oposite);
             snake.add(p);
         }
     }
@@ -34,47 +47,17 @@ public class Snake implements HeadMove {
     }
 
     public void turn(Direction direction) {
-        int oldCol = dirCol;
-        int oldRow = dirRow;
-        switch (direction) {
-        case RIGHT:
-            dirCol = 1;
-            dirRow = 0;
-            break;
-        case LEFT:
-            dirCol = -1;
-            dirRow = 0;
-            break;
-        case UP:
-            dirCol = 0;
-            dirRow = -1;
-            break;
-        case DOWN:
-            dirCol = 0;
-            dirRow = 1;
-            break;
-        default:
-            dirCol = 0;
-            dirRow = 0;
-            System.err.println("Incorrect Snake Direction was sent - "
-                    + direction);
-        }
-
-        // if direction was changed to opposite (new point will be on snake)
-        TextPoint head = new TextPoint(snake.get(0));
-        head.row += dirRow;
-        head.col += dirCol;
-        if (snake.size() > 1 && snake.get(1).equals(head)) {
+        TextPoint head = snake.get(0).move(direction);
+        if (snake.size() > 1 && (snake.get(1).equals(head) || snake.get(0).equals(head))) {
             // don't change direction
-            dirCol = oldCol;
-            dirRow = oldRow;
+            ;
+        } else {
+            this.direction = direction;
         }
     }
 
     public void move() throws SnakeCollision {
-        TextPoint head = new TextPoint(snake.get(0));
-        head.row += dirRow;
-        head.col += dirCol;
+        TextPoint head = snake.get(0).move(this.direction);
         if (snake.contains(head)) {
             throw new SnakeCollision("Snake Head is now on Snake Body.");
         }

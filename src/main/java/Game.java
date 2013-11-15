@@ -7,8 +7,10 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.io.File;
 import java.io.IOException;
+import java.util.HashMap;
 
 import javax.swing.BoxLayout;
+import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JFileChooser;
@@ -65,10 +67,10 @@ public class Game {
 
         score = new JLabel("Score " + gameController.getScore());
         frame.add(score, BorderLayout.SOUTH);
-        
+
         status = new JLabel("Load game");
         frame.add(status, BorderLayout.NORTH);
-        
+
         frame.pack();
     }
 
@@ -80,7 +82,7 @@ public class Game {
 
         Dimension btnSize = new Dimension(200, 25);
         JButton btnDefault = new JButton("Default Game");
-        JButton btnGame = new JButton("Load Game");
+        JButton btnGame = new JButton("Game Constructor");
         JButton btnStart = new JButton("Start Game");
         JButton btnPause = new JButton("Pause Game");
         JButton btnQuit = new JButton("Quit");
@@ -135,7 +137,10 @@ public class Game {
             try {
                 fieldSize = gameController.initField(defaultField);
                 gameController.initSnake(defaultSnakeHead, defaultSnakeDirection, defaultSnakeSize);
-                gameController.initPorts(defaultP1, defaultD1, defaultP2, defaultD2);
+                HashMap<TextPoint, Direction> tmp = new HashMap<TextPoint, Direction>();
+                tmp.put(defaultP1, defaultD1);
+                tmp.put(defaultP2, defaultD2);
+                gameController.initPorts(tmp);
                 gameController.addStars(defaultNumOfStars);
                 initGameField(fieldSize.row, fieldSize.col);
             } catch (IOException | OutOfFieldException | SnakeOnWallException
@@ -156,6 +161,8 @@ public class Game {
                 try {
                     fieldSize = gameController.initField(file.getAbsolutePath());
                     initGameField(fieldSize.row, fieldSize.col);
+                    new PortParams();
+                    gameArea.setText(gameController.toString());
                     new SnakeParams();
                     gameArea.setText(gameController.toString());
                     new StarsParams();
@@ -238,16 +245,6 @@ public class Game {
             tmp.setText(gameController.toString());
             add(tmp);
 
-            // add(new JLabel("Select Snake Head: row"));
-            // int max_size = gameController.field.getRowsNum() - 1;
-            // final ParamSlider sliderRow = new ParamSlider(0, max_size, 5);
-            // add(sliderRow);
-            //
-            // add(new JLabel("Select Snake Head: col"));
-            // max_size = gameController.field.getColsNum() - 1;
-            // final ParamSlider sliderCol = new ParamSlider(0, max_size, 5);
-            // add(sliderCol);
-
             add(new JLabel("Select Snake size"));
             int max_size = 3 + gameController.field.getEffectiveSize() / 30;
             final ParamSlider sliderSize = new ParamSlider(1, max_size, 3);
@@ -321,6 +318,77 @@ public class Game {
             setLocationRelativeTo(null);
             setVisible(true);
         }
+    }
+
+    class PortParams extends JDialog {
+        int                           caret            = 0;
+        int                           count            = 0;
+        HashMap<TextPoint, Direction> ports            = new HashMap<TextPoint, Direction>();
+        /**
+         * 
+         */
+        private static final long     serialVersionUID = 3538062280708782118L;
+
+        public PortParams() {
+            super();
+            setLayout(new BoxLayout(getContentPane(), BoxLayout.Y_AXIS));
+
+            add(new JLabel("Set Port position"));
+            final GameArea tmp = new GameArea(fieldSize.row, fieldSize.col);
+            tmp.setText(gameController.toString());
+            add(tmp);
+
+            add(new JLabel("Select Port out direction"));
+            final ParamDirection list = new ParamDirection();
+            add(list);
+
+            JButton btnPort = new JButton("Add Port");
+            add(btnPort);
+
+            final DefaultListModel<TextPoint> listModal = new DefaultListModel<TextPoint>();
+            final JList<TextPoint> portList = new JList<TextPoint>(listModal);
+            add(portList);
+
+            final JButton btnInit = new JButton("Init Teleport " + count);
+            add(btnInit);
+
+            btnPort.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    caret = tmp.getCaretPosition();
+                    int row = caret / (fieldSize.col + 1);
+                    int col = caret % (fieldSize.col + 1);
+                    ports.put(new TextPoint(row, col), list.getSelectedValue());
+                    listModal.addElement(new TextPoint(row, col));
+                }
+            });
+
+            btnInit.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    try {
+                        gameController.initPorts(ports);
+                        ports.clear();
+                        listModal.clear();
+                        count++;
+                        btnInit.setText("Init Teleport " + count);
+                    } catch (TeleportInitException | OutOfFieldException e1) {
+                        e1.printStackTrace();
+                    }
+
+                }
+            });
+
+            pack();
+
+            setModalityType(ModalityType.APPLICATION_MODAL);
+            setTitle("Select Snake params");
+            setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+            setLocationRelativeTo(null);
+            setVisible(true);
+
+        }
+
     }
 
     class ParamSlider extends JSlider {

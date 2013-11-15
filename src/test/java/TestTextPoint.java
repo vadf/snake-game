@@ -40,6 +40,34 @@ public class TestTextPoint {
     @Test
     public void testEqualsFalse() {
         TextPoint test = new TextPoint(row, col - 1);
-        assertNotEquals("Check TextPoint col value.", test, point);
+        assertNotEquals("Check TextPoint are not equal.", test, point);
+    }
+    
+    @Test
+    public void testMoveRight() {        
+        TextPoint actual = point.move(Direction.RIGHT);
+        TextPoint expected = new TextPoint(point.row, point.col + 1);
+        assertEquals("Check TextPoint col value.", expected, actual);
+    }
+    
+    @Test
+    public void testMoveLeft() {        
+        TextPoint actual = point.move(Direction.LEFT);
+        TextPoint expected = new TextPoint(point.row, point.col - 1);
+        assertEquals("Check TextPoint col value.", expected, actual);
+    }
+    
+    @Test
+    public void testMoveUp() {        
+        TextPoint actual = point.move(Direction.UP);
+        TextPoint expected = new TextPoint(point.row - 1, point.col);
+        assertEquals("Check TextPoint col value.", expected, actual);
+    }
+    
+    @Test
+    public void testMoveDown() {        
+        TextPoint actual = point.move(Direction.DOWN);
+        TextPoint expected = new TextPoint(point.row + 1, point.col);
+        assertEquals("Check TextPoint col value.", expected, actual);
     }
 }

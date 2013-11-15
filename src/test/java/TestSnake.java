@@ -32,17 +32,13 @@ public class TestSnake {
     @Test
     public void testIsOnSnakeTrue() {
         TextPoint p = new TextPoint(head.row, head.col - snakeSize + 1);
-        boolean expected = true;
-        boolean actual = snake.isOnSnake(p);
-        assertEquals("Check Is point on Snake.", expected, actual);
+        assertTrue("Check Is point on Snake.", snake.isOnSnake(p));
     }
 
     @Test
     public void testIsOnSnakeFalse() {
         TextPoint p = new TextPoint(head.row, head.col + 1);
-        boolean expected = false;
-        boolean actual = snake.isOnSnake(p);
-        assertEquals("Check Is point on Snake.", expected, actual);
+        assertFalse("Check Is point on Snake.", snake.isOnSnake(p));
     }
 
     @Test
@@ -156,8 +152,7 @@ public class TestSnake {
     }
 
     @Test(expected = SnakeCollision.class)
-    public void testMoveSnakeCollision() throws SnakeAddException,
-            SnakeCollision {
+    public void testMoveSnakeCollision() throws SnakeAddException, SnakeCollision {
         snake.move();
         snake.add();
 

@@ -1,11 +1,14 @@
 import static org.junit.Assert.*;
 
+import java.util.HashMap;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
 public class TestTeleport {
     private Teleport  port;
+    private HashMap<TextPoint, Direction> testPorts;
     private TextPoint p1    = new TextPoint(1, 1);
     private TextPoint p2    = new TextPoint(p1.row * 3, p1.col * 4);
     private TextPoint p3    = new TextPoint(p1.row * 3, p1.col + 1);
@@ -16,17 +19,46 @@ public class TestTeleport {
 
     @Before
     public void setUp() throws Exception {
-        port = new Teleport(p1, right, p2, down);
+        testPorts = new HashMap<TextPoint, Direction>();
+        testPorts.put(p1, right);
+        testPorts.put(p2, down);
+        port = new Teleport(testPorts);
     }
 
     @After
     public void tearDown() throws Exception {
         port = null;
+        testPorts = null;
     }
 
     @Test(expected = TeleportInitException.class)
-    public void testTeleport() throws TeleportInitException {
+    public void testInitFailed() throws TeleportInitException {
         new Teleport(p1, right, new TextPoint(p1), up);
+    }
+    
+    @Test(expected = TeleportInitException.class)
+    public void testInitFailed2() throws TeleportInitException {
+        testPorts = new HashMap<TextPoint, Direction>();
+        testPorts.put(p1, right);
+        testPorts.put(new TextPoint(p1), up);
+        new Teleport(testPorts);
+    }
+    
+    @Test
+    public void testInitTeleport() throws TeleportInitException {
+        new Teleport(p1, right, p2, up);
+        int actual = port.getNumOfPorts();
+        int expected = 2;
+        assertEquals("Check number of ports after init.", expected, actual);
+    }
+    
+    @Test
+    public void testInitTeleport2() throws TeleportInitException {
+        testPorts.put(p3, up);
+        port = new Teleport(testPorts);
+        int actual = port.getNumOfPorts();
+        int expected = 3;
+        assertEquals("Check number of ports after init.", expected, actual);
     }
 
     @Test

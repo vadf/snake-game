@@ -14,6 +14,12 @@ public class Teleport {
         ports.put(p2, d2);
     }
 
+    public Teleport(HashMap<TextPoint, Direction> ports) throws TeleportInitException {
+        if (ports.size() < 2)
+            throw new TeleportInitException("There are should be at least two ports for init.");
+        this.ports = new HashMap<TextPoint, Direction>(ports);
+    }
+
     public boolean add(TextPoint port, Direction d) {
         if (ports.containsKey(port))
             return false;
