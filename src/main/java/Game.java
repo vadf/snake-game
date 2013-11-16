@@ -18,6 +18,7 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JSlider;
 import javax.swing.JTextArea;
 import javax.swing.ListSelectionModel;
@@ -42,7 +43,8 @@ public class Game {
     private JFrame                frame;
     private Timer                 t;
     private GameArea              gameArea;
-    private JLabel                score, status;
+    private JLabel                score, lStatus;
+    private GameStatus            eStatus;
 
     public static void main(String[] args) {
 
@@ -58,6 +60,7 @@ public class Game {
     public Game() {
         gameController = new GameController();
         t = new Timer(1000, this.new MoveTask());
+        eStatus = GameStatus.LOAD_GAME;
     }
 
     public void initGameField(int rows, int cols) {
@@ -68,8 +71,8 @@ public class Game {
         score = new JLabel("Score " + gameController.getScore());
         frame.add(score, BorderLayout.SOUTH);
 
-        status = new JLabel("Load game");
-        frame.add(status, BorderLayout.NORTH);
+        lStatus = new JLabel(eStatus.toString());
+        frame.add(lStatus, BorderLayout.NORTH);
 
         frame.pack();
     }
@@ -98,17 +101,23 @@ public class Game {
             @Override
             public void actionPerformed(ActionEvent e) {
                 gameArea.setText(gameController.toString());
-                gameArea.requestFocusInWindow();
-                status.setText("Playing");
-                t.start();
+                if (eStatus == GameStatus.READY_TO_PLAY || eStatus == GameStatus.PAUSED) {
+                    eStatus = GameStatus.PLAYING;
+                    gameArea.requestFocusInWindow();
+                    lStatus.setText(eStatus.toString());
+                    t.start();
+                }
             }
         });
 
         btnPause.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                t.stop();
-                status.setText("Game paused");
+                if (eStatus == GameStatus.PLAYING) {
+                    eStatus = GameStatus.PAUSED;
+                    t.stop();
+                    lStatus.setText(eStatus.toString());
+                }
             }
         });
 
@@ -145,9 +154,12 @@ public class Game {
                 initGameField(fieldSize.row, fieldSize.col);
             } catch (IOException | OutOfFieldException | SnakeOnWallException
                     | TeleportInitException e1) {
-                status.setText("Load failed: " + e1.getMessage());
+                eStatus = GameStatus.LOAD_ERROR;
+                lStatus.setText(eStatus + ": " + e1.getMessage());
                 System.err.println(e1.getMessage());
             }
+            if (eStatus != GameStatus.LOAD_ERROR)
+                eStatus = GameStatus.READY_TO_PLAY;
         }
     }
 
@@ -168,9 +180,12 @@ public class Game {
                     new StarsParams();
                     gameArea.setText(gameController.toString());
                 } catch (IOException e1) {
-                    status.setText("Load failed: " + e1.getMessage());
+                    eStatus = GameStatus.LOAD_ERROR;
+                    lStatus.setText(eStatus + ": " + e1.getMessage());
                     System.err.println(e1.getMessage());
                 }
+                if (eStatus != GameStatus.LOAD_ERROR)
+                    eStatus = GameStatus.READY_TO_PLAY;
             }
         }
     }
@@ -213,19 +228,20 @@ public class Game {
                 gameController.move();
                 // generate new star if needed
                 if (gameController.checkAndCreateStar()) {
-                    status.setText("Congratulations, You Win");
+                    eStatus = GameStatus.CONTRATULATIONS;
+                    lStatus.setText(eStatus.toString());
                     System.out.println("Congratulations");
                     t.stop();
                 }
                 gameArea.setText(gameController.toString());
             } catch (SnakeOnWallException | OutOfFieldException | SnakeAddException
                     | SnakeCollision e1) {
-                status.setText("Game over: " + e1.getMessage());
+                eStatus = GameStatus.GAME_OVER;
+                lStatus.setText(eStatus + ": " + e1.getMessage());
                 System.err.println(e1.getMessage());
                 t.stop();
             }
             score.setText("Score " + gameController.getScore());
-            ;
         }
     }
 
@@ -243,15 +259,18 @@ public class Game {
             add(new JLabel("Set Snake Head initial position"));
             final GameArea tmp = new GameArea(fieldSize.row, fieldSize.col);
             tmp.setText(gameController.toString());
+            tmp.setAlignmentX(LEFT_ALIGNMENT);
             add(tmp);
 
             add(new JLabel("Select Snake size"));
             int max_size = 3 + gameController.field.getEffectiveSize() / 30;
             final ParamSlider sliderSize = new ParamSlider(1, max_size, 3);
+            sliderSize.setAlignmentX(LEFT_ALIGNMENT);
             add(sliderSize);
 
             add(new JLabel("Select Snake direction"));
             final ParamDirection list = new ParamDirection();
+            list.setAlignmentX(LEFT_ALIGNMENT);
             add(list);
 
             JButton btnSave = new JButton("Save");
@@ -265,8 +284,12 @@ public class Game {
 
                         gameController.initSnake(new TextPoint(row, col), list.getSelectedValue(),
                                 sliderSize.getValue());
+                        eStatus = GameStatus.LOAD_GAME;
+                        lStatus.setText(eStatus + ": Sanke Init Done");
                         dispose();
                     } catch (OutOfFieldException | SnakeOnWallException e1) {
+                        eStatus = GameStatus.LOAD_ERROR;
+                        lStatus.setText(eStatus + ": " + e1.getMessage());
                         System.err
                                 .println("Snake Init Failed. Please select another Snake params.");
                         System.err.println(e1.getMessage());
@@ -295,7 +318,7 @@ public class Game {
             super();
             setLayout(new BoxLayout(getContentPane(), BoxLayout.Y_AXIS));
 
-            add(new JLabel("Sel number of Stars"));
+            add(new JLabel("Set number of Stars"));
             int max_size = 5 + gameController.field.getEffectiveSize() / 20;
             final ParamSlider slider = new ParamSlider(1, max_size, 5);
             add(slider);
@@ -336,21 +359,36 @@ public class Game {
             add(new JLabel("Set Port position"));
             final GameArea tmp = new GameArea(fieldSize.row, fieldSize.col);
             tmp.setText(gameController.toString());
+            tmp.setAlignmentX(LEFT_ALIGNMENT);
             add(tmp);
 
             add(new JLabel("Select Port out direction"));
             final ParamDirection list = new ParamDirection();
+            list.setAlignmentX(LEFT_ALIGNMENT);
             add(list);
 
             JButton btnPort = new JButton("Add Port");
             add(btnPort);
 
-            final DefaultListModel<TextPoint> listModal = new DefaultListModel<TextPoint>();
-            final JList<TextPoint> portList = new JList<TextPoint>(listModal);
-            add(portList);
+            final DefaultListModel<String> listModel = new DefaultListModel<String>();
+            final JList<String> portList = new JList<String>(listModel);
+            portList.setVisibleRowCount(5);
+            JScrollPane scrollPane = new JScrollPane(portList);
+            scrollPane.setAlignmentX(LEFT_ALIGNMENT);
+            add(scrollPane);
 
             final JButton btnInit = new JButton("Init Teleport " + count);
             add(btnInit);
+
+            JButton btnClose = new JButton("Close");
+            add(btnClose);
+
+            btnClose.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    dispose();
+                }
+            });
 
             btnPort.addActionListener(new ActionListener() {
                 @Override
@@ -359,7 +397,7 @@ public class Game {
                     int row = caret / (fieldSize.col + 1);
                     int col = caret % (fieldSize.col + 1);
                     ports.put(new TextPoint(row, col), list.getSelectedValue());
-                    listModal.addElement(new TextPoint(row, col));
+                    listModel.addElement(new TextPoint(row, col) + ": " + list.getSelectedValue());
                 }
             });
 
@@ -369,13 +407,19 @@ public class Game {
                     try {
                         gameController.initPorts(ports);
                         ports.clear();
-                        listModal.clear();
+                        listModel.clear();
                         count++;
                         btnInit.setText("Init Teleport " + count);
+                        tmp.setText(gameController.toString());
+                        eStatus = GameStatus.LOAD_GAME;
+                        lStatus.setText(eStatus + ": Ports Init Done");
                     } catch (TeleportInitException | OutOfFieldException e1) {
-                        e1.printStackTrace();
+                        eStatus = GameStatus.LOAD_ERROR;
+                        lStatus.setText(eStatus + ": " + e1.getMessage());
+                        System.err.println(e1.getMessage());
+                        ports.clear();
+                        listModel.clear();
                     }
-
                 }
             });
 
@@ -386,9 +430,7 @@ public class Game {
             setDefaultCloseOperation(DISPOSE_ON_CLOSE);
             setLocationRelativeTo(null);
             setVisible(true);
-
         }
-
     }
 
     class ParamSlider extends JSlider {
@@ -418,4 +460,8 @@ public class Game {
             setSelectedIndex(0);
         }
     }
+}
+
+enum GameStatus {
+    PLAYING, PAUSED, LOAD_GAME, READY_TO_PLAY, CONTRATULATIONS, GAME_OVER, LOAD_ERROR
 }
