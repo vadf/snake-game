@@ -9,13 +9,11 @@ import java.util.List;
 
 public class GameField {
     final static Charset    ENCODING = StandardCharsets.UTF_8;
-
-    private char            WALL     = '#';
     private List<TextPoint> walls    = new ArrayList<TextPoint>();
     private int             rows;
     private int             cols;
 
-    public GameField(String filename) throws IOException {
+    public GameField(String filename) throws IOException, FieldInitException {
         Path path = Paths.get(filename);
         List<String> tmpField = Files.readAllLines(path, ENCODING);
         rows = tmpField.size();
@@ -24,9 +22,11 @@ public class GameField {
         int i = 0;
         char ch;
         for (String line : tmpField) {
+            if (cols != line.length())
+                throw new FieldInitException("Game Field is not rectangle.");
             for (int j = 0; j < line.length(); j++) {
                 ch = line.charAt(j);
-                if (ch == WALL) {
+                if (ch != ' ') {
                     walls.add(new TextPoint(i, j));
                 }
             }
@@ -36,7 +36,7 @@ public class GameField {
 
     public boolean isWall(TextPoint p) throws OutOfFieldException {
         if (!isInField(p)) {
-            throw new OutOfFieldException("Point is out of game Field");
+            throw new OutOfFieldException("Point is out of game Field: " + p);
         }
         return walls.contains(p);
     }
@@ -87,9 +87,25 @@ class OutOfFieldException extends Exception {
     private static final long serialVersionUID = 6911686971633228894L;
 
     public OutOfFieldException() {
+        super();
     }
 
     public OutOfFieldException(String message) {
+        super(message);
+    }
+}
+
+class FieldInitException extends Exception {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 4667666295077915400L;
+
+    public FieldInitException() {
+        super();
+    }
+
+    public FieldInitException(String message) {
         super(message);
     }
 }

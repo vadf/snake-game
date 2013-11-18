@@ -100,8 +100,8 @@ public class Game {
         btnStart.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                gameArea.setText(gameController.toString());
                 if (eStatus == GameStatus.READY_TO_PLAY || eStatus == GameStatus.PAUSED) {
+                    gameArea.setText(gameController.toString());
                     eStatus = GameStatus.PLAYING;
                     gameArea.requestFocusInWindow();
                     lStatus.setText(eStatus.toString());
@@ -153,7 +153,7 @@ public class Game {
                 gameController.addStars(defaultNumOfStars);
                 initGameField(fieldSize.row, fieldSize.col);
             } catch (IOException | OutOfFieldException | SnakeOnWallException
-                    | TeleportInitException e1) {
+                    | TeleportInitException | FieldInitException e1) {
                 eStatus = GameStatus.LOAD_ERROR;
                 lStatus.setText(eStatus + ": " + e1.getMessage());
                 System.err.println(e1.getMessage());
@@ -179,7 +179,7 @@ public class Game {
                     gameArea.setText(gameController.toString());
                     new StarsParams();
                     gameArea.setText(gameController.toString());
-                } catch (IOException e1) {
+                } catch (IOException | FieldInitException e1) {
                     eStatus = GameStatus.LOAD_ERROR;
                     lStatus.setText(eStatus + ": " + e1.getMessage());
                     System.err.println(e1.getMessage());
@@ -283,7 +283,7 @@ public class Game {
                         int col = caret % (fieldSize.col + 1);
 
                         gameController.initSnake(new TextPoint(row, col), list.getSelectedValue(),
-                                sliderSize.getValue());
+                                sliderSize.getValue(), fieldSize);
                         eStatus = GameStatus.LOAD_GAME;
                         lStatus.setText(eStatus + ": Sanke Init Done");
                         dispose();
@@ -380,7 +380,7 @@ public class Game {
             final JButton btnInit = new JButton("Init Teleport " + count);
             add(btnInit);
 
-            JButton btnClose = new JButton("Close");
+            JButton btnClose = new JButton("Close/Skip");
             add(btnClose);
 
             btnClose.addActionListener(new ActionListener() {

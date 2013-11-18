@@ -171,21 +171,27 @@ public class GameController {
         return score;
     }
 
-    public TextPoint initField(String textField) throws IOException {
+    public TextPoint initField(String textField) throws IOException, FieldInitException {
         field = new GameField(textField);
         return new TextPoint(field.getRowsNum(), field.getColsNum());
     }
 
     public void initSnake(TextPoint snakeHead, Direction snakeDirection, int snakeSize)
             throws OutOfFieldException, SnakeOnWallException {
+        initSnake(snakeHead, snakeDirection, snakeSize, new TextPoint(Integer.MAX_VALUE, Integer.MAX_VALUE));
 
-        snake = new Snake(snakeHead, snakeDirection, snakeSize);
+    }
+    
+    public void initSnake(TextPoint snakeHead, Direction snakeDirection, int snakeSize,
+            TextPoint fieldSize) throws SnakeOnWallException, OutOfFieldException {
+        snake = new Snake(snakeHead, snakeDirection, snakeSize, fieldSize);
         for (TextPoint p : snake.getSnake()) {
             if (field.isWall(p)) {
                 throw new SnakeOnWallException("Snake point " + snake.getSnake().indexOf(p) + ":"
                         + p + " is on the Wall");
             }
         }
+        
     }
 
     public void addStars(int numOfStars) {

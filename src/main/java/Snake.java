@@ -5,8 +5,16 @@ public class Snake implements HeadMove {
     private List<TextPoint> snake = new ArrayList<TextPoint>();
     private TextPoint       tail;
     private Direction       direction;
+    private TextPoint       border;
 
+    // Constructor w/o snake wrapping over field (can lead to OutOfBorder exception on field.isWall check)
     public Snake(TextPoint head, Direction direction, int snakeSize) {
+        this(head, direction, snakeSize, new TextPoint(Integer.MAX_VALUE, Integer.MAX_VALUE));
+    }
+
+    // Constructor w/ snake wrapping over field (if border is correct)
+    public Snake(TextPoint head, Direction direction, int snakeSize, TextPoint border) {
+        this.border = border;
         Direction oposite = Direction.RIGHT;
         switch (direction) {
         case RIGHT:
@@ -48,9 +56,8 @@ public class Snake implements HeadMove {
 
     public void turn(Direction direction) {
         TextPoint head = snake.get(0).move(direction);
-        if (snake.size() > 1 && (snake.get(1).equals(head) || snake.get(0).equals(head))) {
-            // don't change direction
-            ;
+        if (snake.size() > 1 && (snake.get(1).equals(head) || snake.get(0).equals(head))) {            
+            ; // don't change direction
         } else {
             this.direction = direction;
         }
@@ -58,6 +65,10 @@ public class Snake implements HeadMove {
 
     public void move() throws SnakeCollision {
         TextPoint head = snake.get(0).move(this.direction);
+        head.row = head.row % border.row;
+        if (head.row < 0) head.row += border.row;
+        head.col = head.col % border.col;
+        if (head.col < 0) head.col += border.col;
         if (snake.contains(head)) {
             throw new SnakeCollision("Snake Head is now on Snake Body.");
         }
@@ -99,6 +110,7 @@ class SnakeAddException extends Exception {
     private static final long serialVersionUID = 91781899778607805L;
 
     public SnakeAddException() {
+        super();
     }
 
     public SnakeAddException(String message) {
@@ -113,6 +125,7 @@ class SnakeCollision extends Exception {
     private static final long serialVersionUID = 9134731213963921113L;
 
     public SnakeCollision() {
+        super();
     }
 
     public SnakeCollision(String message) {

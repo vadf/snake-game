@@ -11,6 +11,7 @@ public class TestSnake {
     private int       snakeSize = 3;
     private Direction direction = Direction.RIGHT;
     private TextPoint head      = new TextPoint(1, 5);
+    private TextPoint border    = new TextPoint(6, 6);
 
     @Before
     public void setUp() throws Exception {
@@ -20,6 +21,11 @@ public class TestSnake {
     @After
     public void tearDown() throws Exception {
         snake = null;
+    }
+
+    @Test
+    public void testInitSnakeWithBorder() {
+        assertNotNull("Check Snake size.", new Snake(head, direction, snakeSize, border));
     }
 
     @Test
@@ -87,7 +93,7 @@ public class TestSnake {
 
         TextPoint expected = new TextPoint(head.row - 1, head.col);
         TextPoint actual = snake.getHead();
-        assertEquals("Check Snake.", expected, actual);
+        assertEquals("Check Snake Head.", expected, actual);
     }
 
     @Test
@@ -97,7 +103,7 @@ public class TestSnake {
 
         TextPoint expected = new TextPoint(head.row + 1, head.col);
         TextPoint actual = snake.getHead();
-        assertEquals("Check Snake.", expected, actual);
+        assertEquals("Check Snake Head.", expected, actual);
     }
 
     @Test
@@ -108,7 +114,7 @@ public class TestSnake {
 
         TextPoint expected = new TextPoint(head.row, head.col + 1);
         TextPoint actual = snake.getHead();
-        assertEquals("Check Snake.", expected, actual);
+        assertEquals("Check Snake Head.", expected, actual);
     }
 
     @Test
@@ -119,7 +125,7 @@ public class TestSnake {
 
         TextPoint expected = new TextPoint(head.row, head.col - 1);
         TextPoint actual = snake.getHead();
-        assertEquals("Check Snake.", expected, actual);
+        assertEquals("Check Snake Head.", expected, actual);
     }
 
     @Test
@@ -129,7 +135,7 @@ public class TestSnake {
 
         TextPoint expected = new TextPoint(head.row, head.col + 1);
         TextPoint actual = snake.getHead();
-        assertEquals("Check Snake.", expected, actual);
+        assertEquals("Check Snake Head.", expected, actual);
     }
 
     @Test
@@ -148,7 +154,7 @@ public class TestSnake {
 
         TextPoint expected = new TextPoint(head.row, head.col + 1);
         TextPoint actual = snake.getHead();
-        assertEquals("Check Snake.", expected, actual);
+        assertEquals("Check Snake Head.", expected, actual);
     }
 
     @Test(expected = SnakeCollision.class)
@@ -167,6 +173,27 @@ public class TestSnake {
         snake.turn(Direction.UP);
         snake.move(); // collision with snake body
         System.out.println(snake.getSnake() + "");
+    }
+
+    @Test
+    public void testMoveOverBorderRight() throws SnakeCollision {
+        snake = new Snake(head, direction, snakeSize, border);
+        snake.move();
+
+        TextPoint expected = new TextPoint(head.row, 0);
+        TextPoint actual = snake.getHead();
+        assertEquals("Check Snake Head.", expected, actual);
+    }
+
+    @Test
+    public void testMoveOverBorderUp() throws SnakeCollision {
+        snake = new Snake(head, Direction.UP, snakeSize, border);
+        snake.move();
+        snake.move();
+
+        TextPoint expected = new TextPoint(border.row - 1, head.col);
+        TextPoint actual = snake.getHead();
+        assertEquals("Check Snake Head.", expected, actual);
     }
 
     @Test

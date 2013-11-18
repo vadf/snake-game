@@ -1,5 +1,6 @@
 import static org.junit.Assert.*;
 
+import java.io.IOException;
 import java.util.List;
 
 import org.junit.After;
@@ -8,7 +9,8 @@ import org.junit.Test;
 
 public class TestGameField {
     private GameField field;
-    private String    testField = "src/test/resources/TestField.txt";
+    private String    testField    = "src/test/resources/TestField.txt";
+    private String    testFieldNok = "src/test/resources/TestFieldNok.txt";
 
     @Before
     public void setUp() throws Exception {
@@ -18,6 +20,11 @@ public class TestGameField {
     @After
     public void tearDown() throws Exception {
         field = null;
+    }
+
+    @Test(expected = FieldInitException.class)
+    public void testInitNok() throws IOException, FieldInitException {
+        field = new GameField(testFieldNok);
     }
 
     @Test
@@ -44,8 +51,7 @@ public class TestGameField {
     public void testGetEffectiveSize() {
         int expected = 9;
         int actual = field.getEffectiveSize();
-        assertEquals("Check that field effective size is correct.", expected,
-                actual);
+        assertEquals("Check that field effective size is correct.", expected, actual);
     }
 
     @Test

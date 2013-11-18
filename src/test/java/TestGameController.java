@@ -26,7 +26,7 @@ public class TestGameController {
     }
 
     @Test
-    public void testInitField() throws IOException {
+    public void testInitField() throws IOException, FieldInitException {
         TextPoint expected = new TextPoint(4, 7);
         TextPoint actual = game.initField(testField);
 
@@ -37,7 +37,7 @@ public class TestGameController {
 
     @Test
     public void testInitAll() throws OutOfFieldException, IOException, SnakeOnWallException,
-            TeleportInitException {
+            TeleportInitException, FieldInitException {
         int snakeSize = 3;
         Direction snakeDirection = Direction.RIGHT;
         TextPoint snakeHead = new TextPoint(1, 4);
@@ -59,7 +59,7 @@ public class TestGameController {
 
     @Test(expected = SnakeOnWallException.class)
     public void testInitData_HeadOnAWall() throws SnakeOnWallException, OutOfFieldException,
-            IOException {
+            IOException, FieldInitException {
         int snakeSize = 3;
         Direction snakeDirection = Direction.RIGHT;
         TextPoint snakeHead = new TextPoint(1, 6);
@@ -69,7 +69,7 @@ public class TestGameController {
 
     @Test(expected = OutOfFieldException.class)
     public void testInitData_HeadOutOfField() throws OutOfFieldException, IOException,
-            SnakeOnWallException {
+            SnakeOnWallException, FieldInitException {
         int snakeSize = 3;
         Direction snakeDirection = Direction.RIGHT;
         TextPoint snakeHead = new TextPoint(2, 7);
@@ -79,7 +79,7 @@ public class TestGameController {
 
     @Test
     public void testInit_PortOnWall() throws OutOfFieldException, IOException,
-            TeleportInitException {
+            TeleportInitException, FieldInitException {
         TextPoint p1 = new TextPoint(1, 0);
         TextPoint p2 = new TextPoint(2, 5);
         Direction d1 = Direction.RIGHT;
@@ -96,7 +96,7 @@ public class TestGameController {
 
     @Test(expected = TeleportInitException.class)
     public void testInit_PortDirectionNok() throws OutOfFieldException, IOException,
-            PortAddException, TeleportInitException {
+            PortAddException, TeleportInitException, FieldInitException {
         TextPoint p1 = new TextPoint(1, 1);
         TextPoint p2 = new TextPoint(2, 5);
         Direction d1 = Direction.UP;
@@ -110,7 +110,7 @@ public class TestGameController {
 
     @Test
     public void testInit_2Teleports() throws OutOfFieldException, IOException, PortAddException,
-            TeleportInitException {
+            TeleportInitException, FieldInitException {
         TextPoint p1 = new TextPoint(1, 1);
         TextPoint p2 = new TextPoint(2, 5);
         Direction d1 = Direction.RIGHT;
@@ -135,7 +135,7 @@ public class TestGameController {
 
     @Test(expected = TeleportInitException.class)
     public void testInit_2SamePorts() throws OutOfFieldException, IOException, PortAddException,
-            TeleportInitException {
+            TeleportInitException, FieldInitException {
         TextPoint p1 = new TextPoint(1, 1);
         TextPoint p2 = new TextPoint(2, 5);
         Direction d1 = Direction.RIGHT;
@@ -158,7 +158,7 @@ public class TestGameController {
 
     @Test
     public void testToString() throws OutOfFieldException, IOException, SnakeOnWallException,
-            TeleportInitException {
+            TeleportInitException, FieldInitException {
         int snakeSize = 3;
         Direction snakeDirection = Direction.RIGHT;
         TextPoint snakeHead = new TextPoint(1, 4);
@@ -194,7 +194,7 @@ public class TestGameController {
 
     @Test
     public void testMove() throws OutOfFieldException, IOException, SnakeOnWallException,
-            SnakeAddException, SnakeCollision {
+            SnakeAddException, SnakeCollision, FieldInitException {
         int snakeSize = 3;
         Direction snakeDirection = Direction.RIGHT;
         TextPoint snakeHead = new TextPoint(1, 4);
@@ -213,7 +213,7 @@ public class TestGameController {
 
     @Test(expected = SnakeOnWallException.class)
     public void testMoveOnWall() throws OutOfFieldException, IOException, SnakeOnWallException,
-            SnakeAddException, SnakeCollision {
+            SnakeAddException, SnakeCollision, FieldInitException {
         int snakeSize = 3;
         Direction snakeDirection = Direction.RIGHT;
         TextPoint snakeHead = new TextPoint(1, 5);
@@ -225,7 +225,7 @@ public class TestGameController {
 
     @Test
     public void testMoveOnPort() throws OutOfFieldException, IOException, SnakeOnWallException,
-            SnakeAddException, SnakeCollision, TeleportInitException {
+            SnakeAddException, SnakeCollision, TeleportInitException, FieldInitException {
         int snakeSize = 3;
         Direction snakeDirection = Direction.RIGHT;
         TextPoint snakeHead = new TextPoint(1, 4);
@@ -252,7 +252,7 @@ public class TestGameController {
 
     @Test
     public void testMoveOnStar() throws OutOfFieldException, IOException, SnakeOnWallException,
-            SnakeAddException, SnakeCollision {
+            SnakeAddException, SnakeCollision, FieldInitException {
         int snakeSize = 4;
         Direction snakeDirection = Direction.RIGHT;
         TextPoint snakeHead = new TextPoint(1, 4);
@@ -281,7 +281,7 @@ public class TestGameController {
 
     @Test
     public void testGetEmptyPointOk() throws OutOfFieldException, IOException,
-            SnakeOnWallException, SnakeAddException, TeleportInitException {
+            SnakeOnWallException, SnakeAddException, TeleportInitException, FieldInitException {
         int snakeSize = 3;
         Direction snakeDirection = Direction.RIGHT;
         TextPoint snakeHead = new TextPoint(1, 4);
@@ -304,7 +304,7 @@ public class TestGameController {
 
     @Test
     public void testGetEmptyPointNok() throws OutOfFieldException, IOException,
-            SnakeOnWallException, SnakeAddException, TeleportInitException {
+            SnakeOnWallException, SnakeAddException, TeleportInitException, FieldInitException {
         int snakeSize = 3;
         Direction snakeDirection = Direction.RIGHT;
         TextPoint snakeHead = new TextPoint(1, 4);
