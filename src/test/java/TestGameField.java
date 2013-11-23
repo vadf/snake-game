@@ -63,17 +63,10 @@ public class TestGameField {
     }
 
     @Test
-    public void testGetRowsNum() {
-        int expected = 4;
-        int actual = field.getRowsNum();
+    public void testGetFieldSize() {
+        TextPoint expected = new TextPoint(4,7);
+        TextPoint actual = field.getFieldSize();
         assertEquals("Check number of rows.", expected, actual);
-    }
-
-    @Test
-    public void testGetColsNum() {
-        int expected = 7;
-        int actual = field.getColsNum();
-        assertEquals("Check number of columns.", expected, actual);
     }
 
     @Test

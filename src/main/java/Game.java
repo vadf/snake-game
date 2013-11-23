@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.util.HashMap;
 
 import javax.swing.BoxLayout;
+import javax.swing.ButtonGroup;
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JDialog;
@@ -18,6 +19,7 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
+import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
 import javax.swing.JSlider;
 import javax.swing.JTextArea;
@@ -30,18 +32,21 @@ public class Game {
 
     static int                    defaultSnakeSize      = 3;
     static Direction              defaultSnakeDirection = Direction.RIGHT;
-    static TextPoint              defaultSnakeHead      = new TextPoint(1, 5);
-    static String                 defaultField          = "src/main/resources/defaultField.txt";
+    static TextPoint              defaultSnakeHead1     = new TextPoint(1, 5);
+    static TextPoint              defaultSnakeHead2     = new TextPoint(2, 5);
+    static String                 defaultFieldSingle    = "src/main/resources/defaultField.txt";
+    static String                 defaultFieldMulti     = "src/main/resources/field1.txt";
     static int                    defaultNumOfStars     = 3;
     static TextPoint              defaultP1             = new TextPoint(1, 1);
     static Direction              defaultD1             = Direction.RIGHT;
     static TextPoint              defaultP2             = new TextPoint(9, 17);
     static Direction              defaultD2             = Direction.UP;
 
+    private GameType              gameType              = GameType.SINGLE;
     private static GameController gameController;
     private TextPoint             fieldSize;
     private JFrame                frame;
-    private Timer                 t;
+    private Timer                 timer;
     private GameArea              gameArea;
     private JLabel                score, lStatus;
     private GameStatus            eStatus;
@@ -59,7 +64,7 @@ public class Game {
 
     public Game() {
         gameController = new GameController();
-        t = new Timer(1000, this.new MoveTask());
+        timer = new Timer(1000, this.new MoveTask());
         eStatus = GameStatus.LOAD_GAME;
     }
 
@@ -83,6 +88,12 @@ public class Game {
         JPanel pLoad = new JPanel();
         pLoad.setLayout(new BoxLayout(pLoad, BoxLayout.Y_AXIS));
 
+        ButtonGroup group = new ButtonGroup();
+        JRadioButton rbSingle = new JRadioButton("Single Snake classic");
+        rbSingle.setSelected(true);
+        JRadioButton rbMulti = new JRadioButton("Two Snakes");
+        group.add(rbSingle);
+        group.add(rbMulti);
         Dimension btnSize = new Dimension(200, 25);
         JButton btnDefault = new JButton("Default Game");
         JButton btnGame = new JButton("Game Constructor");
@@ -95,6 +106,20 @@ public class Game {
         btnPause.setMaximumSize(btnSize);
         btnQuit.setMaximumSize(btnSize);
 
+        rbSingle.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                gameType = GameType.SINGLE;
+                gameController.setType(gameType);
+            }
+        });
+        rbMulti.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                gameType = GameType.MULTI;
+                gameController.setType(gameType);
+            }
+        });
         btnDefault.addActionListener(this.new DefaultGame());
         btnGame.addActionListener(this.new LoadGame());
         btnStart.addActionListener(new ActionListener() {
@@ -105,7 +130,7 @@ public class Game {
                     eStatus = GameStatus.PLAYING;
                     gameArea.requestFocusInWindow();
                     lStatus.setText(eStatus.toString());
-                    t.start();
+                    timer.start();
                 }
             }
         });
@@ -115,7 +140,7 @@ public class Game {
             public void actionPerformed(ActionEvent e) {
                 if (eStatus == GameStatus.PLAYING) {
                     eStatus = GameStatus.PAUSED;
-                    t.stop();
+                    timer.stop();
                     lStatus.setText(eStatus.toString());
                 }
             }
@@ -128,6 +153,8 @@ public class Game {
             }
         });
 
+        pLoad.add(rbSingle);
+        pLoad.add(rbMulti);
         pLoad.add(btnDefault);
         pLoad.add(btnGame);
         pLoad.add(btnStart);
@@ -144,8 +171,19 @@ public class Game {
         @Override
         public void actionPerformed(ActionEvent e) {
             try {
-                fieldSize = gameController.initField(defaultField);
-                gameController.initSnake(defaultSnakeHead, defaultSnakeDirection, defaultSnakeSize);
+                if (gameType == GameType.SINGLE) {
+                    fieldSize = gameController.initField(defaultFieldSingle);
+                } else {
+                    fieldSize = gameController.initField(defaultFieldMulti);
+                }
+
+                gameController.initSnake(1, defaultSnakeHead1, defaultSnakeDirection,
+                        defaultSnakeSize);
+                if (gameType != GameType.SINGLE) {
+                    gameController.initSnake(2, defaultSnakeHead2, defaultSnakeDirection,
+                            defaultSnakeSize);
+
+                }
                 HashMap<TextPoint, Direction> tmp = new HashMap<TextPoint, Direction>();
                 tmp.put(defaultP1, defaultD1);
                 tmp.put(defaultP2, defaultD2);
@@ -153,7 +191,7 @@ public class Game {
                 gameController.addStars(defaultNumOfStars);
                 initGameField(fieldSize.row, fieldSize.col);
             } catch (IOException | OutOfFieldException | SnakeOnWallException
-                    | TeleportInitException | FieldInitException e1) {
+                    | TeleportInitException | FieldInitException | SnakeCollisionException e1) {
                 eStatus = GameStatus.LOAD_ERROR;
                 lStatus.setText(eStatus + ": " + e1.getMessage());
                 System.err.println(e1.getMessage());
@@ -231,15 +269,15 @@ public class Game {
                     eStatus = GameStatus.CONTRATULATIONS;
                     lStatus.setText(eStatus.toString());
                     System.out.println("Congratulations");
-                    t.stop();
+                    timer.stop();
                 }
                 gameArea.setText(gameController.toString());
             } catch (SnakeOnWallException | OutOfFieldException | SnakeAddException
-                    | SnakeCollision e1) {
+                    | SnakeCollisionException e1) {
                 eStatus = GameStatus.GAME_OVER;
                 lStatus.setText(eStatus + ": " + e1.getMessage());
                 System.err.println(e1.getMessage());
-                t.stop();
+                timer.stop();
             }
             score.setText("Score " + gameController.getScore());
         }
@@ -282,12 +320,12 @@ public class Game {
                         int row = caret / (fieldSize.col + 1);
                         int col = caret % (fieldSize.col + 1);
 
-                        gameController.initSnake(new TextPoint(row, col), list.getSelectedValue(),
-                                sliderSize.getValue(), fieldSize);
+                        gameController.initSnake(1, new TextPoint(row, col),
+                                list.getSelectedValue(), sliderSize.getValue());
                         eStatus = GameStatus.LOAD_GAME;
                         lStatus.setText(eStatus + ": Sanke Init Done");
                         dispose();
-                    } catch (OutOfFieldException | SnakeOnWallException e1) {
+                    } catch (OutOfFieldException | SnakeOnWallException | SnakeCollisionException e1) {
                         eStatus = GameStatus.LOAD_ERROR;
                         lStatus.setText(eStatus + ": " + e1.getMessage());
                         System.err

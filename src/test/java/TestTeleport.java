@@ -7,15 +7,15 @@ import org.junit.Before;
 import org.junit.Test;
 
 public class TestTeleport {
-    private Teleport  port;
+    private Teleport                      port;
     private HashMap<TextPoint, Direction> testPorts;
-    private TextPoint p1    = new TextPoint(1, 1);
-    private TextPoint p2    = new TextPoint(p1.row * 3, p1.col * 4);
-    private TextPoint p3    = new TextPoint(p1.row * 3, p1.col + 1);
-    private Direction right = Direction.RIGHT;
-    private Direction left  = Direction.LEFT;
-    private Direction down  = Direction.DOWN;
-    private Direction up    = Direction.UP;
+    private TextPoint                     p1    = new TextPoint(1, 1);
+    private TextPoint                     p2    = new TextPoint(p1.row * 3, p1.col * 4);
+    private TextPoint                     p3    = new TextPoint(p1.row * 3, p1.col + 1);
+    private Direction                     right = Direction.RIGHT;
+    private Direction                     left  = Direction.LEFT;
+    private Direction                     down  = Direction.DOWN;
+    private Direction                     up    = Direction.UP;
 
     @Before
     public void setUp() throws Exception {
@@ -35,7 +35,7 @@ public class TestTeleport {
     public void testInitFailed() throws TeleportInitException {
         new Teleport(p1, right, new TextPoint(p1), up);
     }
-    
+
     @Test(expected = TeleportInitException.class)
     public void testInitFailed2() throws TeleportInitException {
         testPorts = new HashMap<TextPoint, Direction>();
@@ -43,7 +43,7 @@ public class TestTeleport {
         testPorts.put(new TextPoint(p1), up);
         new Teleport(testPorts);
     }
-    
+
     @Test
     public void testInitTeleport() throws TeleportInitException {
         new Teleport(p1, right, p2, up);
@@ -51,7 +51,7 @@ public class TestTeleport {
         int expected = 2;
         assertEquals("Check number of ports after init.", expected, actual);
     }
-    
+
     @Test
     public void testInitTeleport2() throws TeleportInitException {
         testPorts.put(p3, up);
@@ -72,8 +72,7 @@ public class TestTeleport {
 
     @Test
     public void testAddPortNok() {
-        assertFalse("Check that new port is not added",
-                port.add(new TextPoint(p1), left));
+        assertFalse("Check that new port is not added", port.add(new TextPoint(p1), left));
 
         int expected = 2;
         int actual = port.getNumOfPorts();
@@ -92,7 +91,7 @@ public class TestTeleport {
 
     @Test
     public void testUpdateHead() {
-        Snake snake = new Snake(p2, right, 3);
+        Snake snake = new Snake(p2, right, 3, new TextPoint(100, 100));
         port.updateHead(snake);
         TextPoint actual = snake.getHead();
         assertEquals("Check new Snake Head.", p1, actual);
@@ -101,7 +100,7 @@ public class TestTeleport {
     @Test
     public void testUpdateHead_severalPorts() {
         port.add(p3, left);
-        Snake snake = new Snake(p2, left, 3);
+        Snake snake = new Snake(p2, left, 3, new TextPoint(100, 100));
         port.updateHead(snake);
         TextPoint actual = snake.getHead();
         assertNotEquals("Check that Snake Head is changed.", p2, actual);
@@ -109,7 +108,7 @@ public class TestTeleport {
 
     @Test
     public void testUpdateHead_headNotOnPort() {
-        Snake snake = new Snake(p3, right, 3);
+        Snake snake = new Snake(p3, right, 3, new TextPoint(100, 100));
         port.updateHead(snake);
         TextPoint actual = snake.getHead();
         assertEquals("Check new Snake Head.", p3, actual);

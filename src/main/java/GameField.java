@@ -45,10 +45,12 @@ public class GameField {
         return rows * cols - walls.size();
     }
 
+    @Deprecated
     public int getRowsNum() {
         return rows;
     }
 
+    @Deprecated
     public int getColsNum() {
         return cols;
     }
@@ -77,6 +79,10 @@ public class GameField {
         walls.remove(p);
         return true;
 
+    }
+
+    public TextPoint getFieldSize() {
+        return new TextPoint(rows, cols);
     }
 }
 

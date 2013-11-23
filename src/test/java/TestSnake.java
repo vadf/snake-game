@@ -10,12 +10,12 @@ public class TestSnake {
     private Snake     snake;
     private int       snakeSize = 3;
     private Direction direction = Direction.RIGHT;
-    private TextPoint head      = new TextPoint(1, 5);
+    private TextPoint head      = new TextPoint(1, 4);
     private TextPoint border    = new TextPoint(6, 6);
 
     @Before
     public void setUp() throws Exception {
-        snake = new Snake(head, direction, snakeSize);
+        snake = new Snake(head, direction, snakeSize, border);
     }
 
     @After
@@ -55,7 +55,7 @@ public class TestSnake {
     }
 
     @Test
-    public void testMoveAdd() throws SnakeAddException, SnakeCollision {
+    public void testMoveAdd() throws SnakeAddException, SnakeCollisionException {
         List<TextPoint> expectedSnake = snake.getSnake();
         snake.move();
         snake.add();
@@ -75,7 +75,7 @@ public class TestSnake {
     }
 
     @Test(expected = SnakeAddException.class)
-    public void testAddTwice() throws SnakeAddException, SnakeCollision {
+    public void testAddTwice() throws SnakeAddException, SnakeCollisionException {
         snake.move();
         snake.add();
         snake.add();
@@ -87,7 +87,7 @@ public class TestSnake {
     }
 
     @Test
-    public void testTurnUp() throws SnakeCollision {
+    public void testTurnUp() throws SnakeCollisionException {
         snake.turn(Direction.UP);
         snake.move();
 
@@ -97,7 +97,7 @@ public class TestSnake {
     }
 
     @Test
-    public void testTurnDown() throws SnakeCollision {
+    public void testTurnDown() throws SnakeCollisionException {
         snake.turn(Direction.DOWN);
         snake.move();
 
@@ -107,8 +107,8 @@ public class TestSnake {
     }
 
     @Test
-    public void testTurnRight() throws SnakeCollision {
-        snake = new Snake(head, Direction.UP, snakeSize);
+    public void testTurnRight() throws SnakeCollisionException {
+        snake = new Snake(head, Direction.UP, snakeSize, border);
         snake.turn(Direction.RIGHT);
         snake.move();
 
@@ -118,8 +118,8 @@ public class TestSnake {
     }
 
     @Test
-    public void testTurnLeft() throws SnakeCollision {
-        snake = new Snake(head, Direction.UP, snakeSize);
+    public void testTurnLeft() throws SnakeCollisionException {
+        snake = new Snake(head, Direction.UP, snakeSize, border);
         snake.turn(Direction.LEFT);
         snake.move();
 
@@ -129,7 +129,7 @@ public class TestSnake {
     }
 
     @Test
-    public void testTurnSameDirection() throws SnakeCollision {
+    public void testTurnSameDirection() throws SnakeCollisionException {
         snake.turn(direction);
         snake.move();
 
@@ -139,7 +139,7 @@ public class TestSnake {
     }
 
     @Test
-    public void testTurnOppositeDirection() throws SnakeCollision {
+    public void testTurnOppositeDirection() throws SnakeCollisionException {
         snake.turn(Direction.LEFT);
         snake.move();
 
@@ -149,7 +149,7 @@ public class TestSnake {
     }
 
     @Test
-    public void testMove() throws SnakeCollision {
+    public void testMove() throws SnakeCollisionException {
         snake.move();
 
         TextPoint expected = new TextPoint(head.row, head.col + 1);
@@ -157,8 +157,8 @@ public class TestSnake {
         assertEquals("Check Snake Head.", expected, actual);
     }
 
-    @Test(expected = SnakeCollision.class)
-    public void testMoveSnakeCollision() throws SnakeAddException, SnakeCollision {
+    @Test(expected = SnakeCollisionException.class)
+    public void testMoveSnakeCollision() throws SnakeAddException, SnakeCollisionException {
         snake.move();
         snake.add();
 
@@ -176,8 +176,8 @@ public class TestSnake {
     }
 
     @Test
-    public void testMoveOverBorderRight() throws SnakeCollision {
-        snake = new Snake(head, direction, snakeSize, border);
+    public void testMoveOverBorderRight() throws SnakeCollisionException {
+        snake = new Snake(new TextPoint(head.row, head.col + 1), direction, snakeSize, border);
         snake.move();
 
         TextPoint expected = new TextPoint(head.row, 0);
@@ -186,7 +186,7 @@ public class TestSnake {
     }
 
     @Test
-    public void testMoveOverBorderUp() throws SnakeCollision {
+    public void testMoveOverBorderUp() throws SnakeCollisionException {
         snake = new Snake(head, Direction.UP, snakeSize, border);
         snake.move();
         snake.move();
@@ -197,8 +197,8 @@ public class TestSnake {
     }
 
     @Test
-    public void testChangeHead() throws SnakeCollision {
-        TextPoint newHead = new TextPoint(head.row + 2, head.col + 3);
+    public void testChangeHead() throws SnakeCollisionException {
+        TextPoint newHead = new TextPoint(1, 1);
         snake.changeHeadPosition(newHead, Direction.DOWN);
 
         snake.move();

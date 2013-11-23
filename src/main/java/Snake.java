@@ -8,6 +8,7 @@ public class Snake implements HeadMove {
     private TextPoint       border;
 
     // Constructor w/o snake wrapping over field (can lead to OutOfBorder exception on field.isWall check)
+    @Deprecated
     public Snake(TextPoint head, Direction direction, int snakeSize) {
         this(head, direction, snakeSize, new TextPoint(Integer.MAX_VALUE, Integer.MAX_VALUE));
     }
@@ -63,14 +64,14 @@ public class Snake implements HeadMove {
         }
     }
 
-    public void move() throws SnakeCollision {
+    public void move() throws SnakeCollisionException {
         TextPoint head = snake.get(0).move(this.direction);
         head.row = head.row % border.row;
         if (head.row < 0) head.row += border.row;
         head.col = head.col % border.col;
         if (head.col < 0) head.col += border.col;
         if (snake.contains(head)) {
-            throw new SnakeCollision("Snake Head is now on Snake Body.");
+            throw new SnakeCollisionException("Snake Head is now on Snake Body.");
         }
         snake.add(0, head);
         tail = snake.remove(snake.size() - 1);
@@ -118,17 +119,17 @@ class SnakeAddException extends Exception {
     }
 }
 
-class SnakeCollision extends Exception {
+class SnakeCollisionException extends Exception {
     /**
      * 
      */
     private static final long serialVersionUID = 9134731213963921113L;
 
-    public SnakeCollision() {
+    public SnakeCollisionException() {
         super();
     }
 
-    public SnakeCollision(String message) {
+    public SnakeCollisionException(String message) {
         super(message);
     }
 }

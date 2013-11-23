@@ -8,17 +8,17 @@ import java.util.Random;
 
 public class GameController {
 
-    Snake                snake;
     GameField            field;
+    Snake[]              snake         = new Snake[2];
+    private int[]        score         = { 0, 0 };
     Stars                stars         = new Stars();
     Teleport[]           ports         = new Teleport[9];
-
     private int          maxNumOfStars = 1;
-    private int          score         = 0;
+    private GameType     gameType      = GameType.SINGLE;
 
     protected final char WALL          = '#';
-    protected final char HEAD          = '@';
-    protected final char BODY          = '*';
+    protected final char HEAD[]        = { '@', '0' };
+    protected final char BODY[]        = { '*', 'o' };
     protected final char STAR          = '+';
 
     private boolean isPort(TextPoint point) {
@@ -40,7 +40,10 @@ public class GameController {
             }
         }
 
-        if (field.getEffectiveSize() - snake.getSize() - stars.getStars().size() - ports_size == 0) {
+        int restSize = field.getEffectiveSize() - snake[0].getSize() - stars.getStars().size()
+                - ports_size;
+        restSize -= gameType == GameType.SINGLE ? 0 : snake[1].getSize();
+        if (restSize == 0) {
             return null;
         }
 
@@ -51,12 +54,13 @@ public class GameController {
 
         try {
             while (true) {
-                row = r.nextInt(field.getRowsNum());
-                col = r.nextInt(field.getColsNum());
+                row = r.nextInt(field.getFieldSize().row);
+                col = r.nextInt(field.getFieldSize().col);
                 point = new TextPoint(row, col);
 
-                if (!field.isWall(point) && !snake.isOnSnake(point) && !stars.isStar(point)
-                        && !isPort(point))
+                if (!field.isWall(point) && !snake[0].isOnSnake(point) && !stars.isStar(point)
+                        && !isPort(point)
+                        && !(gameType != GameType.SINGLE && snake[1].isOnSnake(point)))
                     break;
             }
         } catch (OutOfFieldException e) {
@@ -68,7 +72,7 @@ public class GameController {
 
     @Override
     public String toString() {
-        char[][] textField = new char[field.getRowsNum()][field.getColsNum()];
+        char[][] textField = new char[field.getFieldSize().row][field.getFieldSize().col];
         for (int i = 0; i < textField.length; i++) {
             Arrays.fill(textField[i], ' ');
         }
@@ -80,13 +84,17 @@ public class GameController {
             }
         }
 
-        if (snake != null) {
-            List<TextPoint> snakeList = snake.getSnake();
-            for (TextPoint p : snakeList) {
-                textField[p.row][p.col] = BODY;
+        for (int i = 0; i < snake.length; i++) {
+            if (snake[i] != null) {
+                if (gameType == GameType.SINGLE && i >= 1)
+                    break;
+                List<TextPoint> snakeList = snake[i].getSnake();
+                for (TextPoint p : snakeList) {
+                    textField[p.row][p.col] = BODY[i];
+                }
+                TextPoint head = snake[i].getHead();
+                textField[head.row][head.col] = HEAD[i];
             }
-            TextPoint head = snake.getHead();
-            textField[head.row][head.col] = HEAD;
         }
 
         if (stars != null) {
@@ -112,25 +120,32 @@ public class GameController {
     }
 
     public void move() throws SnakeOnWallException, OutOfFieldException, SnakeAddException,
-            SnakeCollision {
-        snake.move();
-        TextPoint head = snake.getHead();
-        if (field.isWall(head)) {
-            throw new SnakeOnWallException("Snake Head is on the Wall");
-        }
-        if (stars.isStar(head)) {
-            snake.add();
-            stars.remove(head);
-            score++;
-        }
-
-        for (int i = 0; i < ports.length; i++) {
-            if (ports[i] != null && ports[i].isPort(head)) {
-                ports[i].updateHead(snake);
+            SnakeCollisionException {
+        for (int j = 0; j < snake.length; j++) {
+            if (gameType == GameType.SINGLE && j >= 1)
                 break;
+            snake[j].move();
+            TextPoint head = snake[j].getHead();
+            if (field.isWall(head)) {
+                throw new SnakeOnWallException("Snake Head is on the Wall");
+            }
+            if (stars.isStar(head)) {
+                snake[j].add();
+                stars.remove(head);
+                score[j]++;
+            }
+            for (int i = 0; i < ports.length; i++) {
+                if (ports[i] != null && ports[i].isPort(head)) {
+                    ports[i].updateHead(snake[j]);
+                    break;
+                }
             }
         }
 
+        if (gameType == GameType.MULTI) {
+            if (snake[0].isOnSnake(snake[1].getHead()) || snake[1].isOnSnake(snake[0].getHead()))
+                throw new SnakeCollisionException("Snakes crash");
+        }
     }
 
     public boolean checkAndCreateStar() throws OutOfFieldException {
@@ -149,49 +164,57 @@ public class GameController {
     public void setDirection(int key) {
         switch (key) {
         case KeyEvent.VK_UP:
+            snake[0].turn(Direction.UP);
+            break;
         case KeyEvent.VK_W:
-            snake.turn(Direction.UP);
+            snake[1].turn(Direction.UP);
             break;
         case KeyEvent.VK_LEFT:
+            snake[0].turn(Direction.LEFT);
+            break;
         case KeyEvent.VK_A:
-            snake.turn(Direction.LEFT);
+            snake[1].turn(Direction.LEFT);
             break;
         case KeyEvent.VK_DOWN:
+            snake[0].turn(Direction.DOWN);
+            break;
         case KeyEvent.VK_S:
-            snake.turn(Direction.DOWN);
+            snake[1].turn(Direction.DOWN);
             break;
         case KeyEvent.VK_RIGHT:
+            snake[0].turn(Direction.RIGHT);
+            break;
         case KeyEvent.VK_D:
-            snake.turn(Direction.RIGHT);
+            snake[1].turn(Direction.RIGHT);
             break;
         }
     }
 
-    public int getScore() {
+    public int[] getScore() {
         return score;
     }
 
     public TextPoint initField(String textField) throws IOException, FieldInitException {
         field = new GameField(textField);
-        return new TextPoint(field.getRowsNum(), field.getColsNum());
+        return field.getFieldSize();
     }
 
-    public void initSnake(TextPoint snakeHead, Direction snakeDirection, int snakeSize)
-            throws OutOfFieldException, SnakeOnWallException {
-        initSnake(snakeHead, snakeDirection, snakeSize, new TextPoint(Integer.MAX_VALUE, Integer.MAX_VALUE));
-
-    }
-    
-    public void initSnake(TextPoint snakeHead, Direction snakeDirection, int snakeSize,
-            TextPoint fieldSize) throws SnakeOnWallException, OutOfFieldException {
-        snake = new Snake(snakeHead, snakeDirection, snakeSize, fieldSize);
-        for (TextPoint p : snake.getSnake()) {
+    public void initSnake(int num, TextPoint snakeHead, Direction snakeDirection, int snakeSize)
+            throws OutOfFieldException, SnakeOnWallException, SnakeCollisionException {
+        snake[num - 1] = new Snake(snakeHead, snakeDirection, snakeSize, field.getFieldSize());
+        for (TextPoint p : snake[num - 1].getSnake()) {
             if (field.isWall(p)) {
-                throw new SnakeOnWallException("Snake point " + snake.getSnake().indexOf(p) + ":"
-                        + p + " is on the Wall");
+                throw new SnakeOnWallException("Snake point "
+                        + snake[num - 1].getSnake().indexOf(p) + ":" + p + " is on the Wall");
             }
         }
-        
+
+        if (gameType != GameType.SINGLE && snake[0] != null && snake[1] != null) {
+            for (TextPoint p : snake[0].getSnake()) {
+                if (snake[1].isOnSnake(p))
+                    throw new SnakeCollisionException("Snake Collision during Init");
+            }
+        }
     }
 
     public void addStars(int numOfStars) {
@@ -232,6 +255,10 @@ public class GameController {
             throw new TeleportInitException("Port " + p + " is already exists");
         }
     }
+
+    public void setType(GameType gameType) {
+        this.gameType = gameType;
+    }
 }
 
 class SnakeOnWallException extends Exception {
@@ -262,4 +289,8 @@ class PortAddException extends Exception {
     public PortAddException(String message) {
         super(message);
     }
+}
+
+enum GameType {
+    SINGLE, MULTI, MULTI_BATTLE
 }
