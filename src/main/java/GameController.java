@@ -1,5 +1,10 @@
 import java.awt.event.KeyEvent;
 import java.io.IOException;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -258,6 +263,77 @@ public class GameController {
 
     public void setType(GameType gameType) {
         this.gameType = gameType;
+    }
+
+    public TextPoint initFromConfig(String filename) throws IOException, FieldInitException,
+            OutOfFieldException, SnakeOnWallException, SnakeCollisionException,
+            TeleportInitException {
+        Charset ENCODING = StandardCharsets.UTF_8;
+        Path path = Paths.get(filename);
+        List<String> tmpField = Files.readAllLines(path, ENCODING);
+
+        HashMap<String, String> gameParams = new HashMap<String, String>();
+        for (String line : tmpField) {
+            String param, value = null;
+            String[] tmp = line.split("=");
+            param = tmp[0].trim();
+            if (tmp.length > 1)
+                value = tmp[1].trim();
+            gameParams.put(param, value);
+        }
+
+        GameType gameType = GameType.SINGLE;
+        String type = gameParams.get("type");
+        if (type.equals("MULTI")) {
+            gameType = GameType.MULTI;
+        } else if (type.equals("MULTI_BATTLE")) {
+            gameType = GameType.MULTI_BATTLE;
+        }
+        setType(gameType);
+        TextPoint fieldSize = initField(gameParams.get("field_path"));
+
+        String[] snake = gameParams.get("snake_1").split(",");
+        TextPoint head = new TextPoint(new Integer(snake[0]), new Integer(snake[1]));
+        Direction dir = textToDirection(snake[1]);
+        int size = new Integer(snake[3]);
+        initSnake(1, head, dir, size);
+        if (gameType != GameType.SINGLE) {
+            snake = gameParams.get("snake_2").split(",");
+            head = new TextPoint(new Integer(snake[0]), new Integer(snake[1]));
+            dir = textToDirection(snake[2]);
+            size = new Integer(snake[3]);
+            initSnake(2, head, dir, size);
+        }
+
+        String[] teleports = gameParams.get("teleports").split("\\|");
+        for (int i = 0; i < teleports.length; i++) {
+            String[] ports = teleports[i].split(";");
+            HashMap<TextPoint, Direction> p = new HashMap<TextPoint, Direction>();
+            for (int j = 0; j < ports.length; j++) {
+                String[] port = ports[j].split(",");
+                p.put(new TextPoint(new Integer(port[0]), new Integer(port[1])),
+                        textToDirection(port[2]));
+            }
+            initPorts(p);
+        }
+
+        addStars(new Integer(gameParams.get("stars")));
+
+        return fieldSize;
+    }
+
+    private Direction textToDirection(String direction) {
+        Direction dir = Direction.RIGHT;
+        if (direction.equals("RIGHT")) {
+            dir = Direction.RIGHT;
+        } else if (direction.equals("LEFT")) {
+            dir = Direction.LEFT;
+        } else if (direction.equals("UP")) {
+            dir = Direction.UP;
+        } else if (direction.equals("DOWN")) {
+            dir = Direction.DOWN;
+        }
+        return dir;
     }
 }
 

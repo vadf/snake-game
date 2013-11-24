@@ -10,17 +10,18 @@ import org.junit.Test;
 
 public class TestGameController {
     private GameController                game;
-    private String                        testField      = "src/test/resources/TestField.txt";
+    private String                        testField        = "src/test/resources/TestField.txt";
     private HashMap<TextPoint, Direction> ports;
 
-    private int                           snakeSize      = 3;
-    private Direction                     snakeDirection = Direction.RIGHT;
-    private TextPoint                     snakeHead      = new TextPoint(1, 4);
-    private int                           numOfStars     = 3;
-    private TextPoint                     p1             = new TextPoint(1, 1);
-    private TextPoint                     p2             = new TextPoint(1, 5);
-    private Direction                     d1             = Direction.RIGHT;
-    private Direction                     d2             = Direction.DOWN;
+    private int                           snakeSize        = 3;
+    private Direction                     snakeDirection   = Direction.RIGHT;
+    private TextPoint                     snakeHead        = new TextPoint(1, 4);
+    private int                           numOfStars       = 3;
+    private TextPoint                     p1               = new TextPoint(1, 1);
+    private TextPoint                     p2               = new TextPoint(1, 5);
+    private Direction                     d1               = Direction.RIGHT;
+    private Direction                     d2               = Direction.DOWN;
+    private String                        gameConfigSingle = "src/test/resources/test_single.config";
 
     @Before
     public void setUp() throws Exception {
@@ -55,6 +56,19 @@ public class TestGameController {
         assertNotNull("Check that GameController Field is initialized.", game.field);
         assertNotNull("Check that Snake1 is initialized.", game.snake[0]);
         assertNull("Check that Snake2 is not initialized.", game.snake[1]);
+        assertEquals("Check number of stars", 3, game.stars.getNumOfStars());
+    }
+
+    @Test
+    public void testInitSingleFromConfi() throws OutOfFieldException, IOException,
+            SnakeOnWallException, TeleportInitException, FieldInitException,
+            SnakeCollisionException {
+        game.initFromConfig(gameConfigSingle);
+
+        assertNotNull("Check that GameController Field is initialized.", game.field);
+        assertNotNull("Check that Snake1 is initialized.", game.snake[0]);
+        assertNull("Check that Snake2 is not initialized.", game.snake[1]);
+        assertEquals("Check number of stars", 3, game.stars.getNumOfStars());
     }
 
     @Test

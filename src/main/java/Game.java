@@ -29,20 +29,10 @@ import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 
 public class Game {
+    private final String          defaultSingle = "src/main/resources/single_game.config";
+    private final String          defaultMulti  = "src/main/resources/multi_game.config";
 
-    static int                    defaultSnakeSize      = 3;
-    static Direction              defaultSnakeDirection = Direction.RIGHT;
-    static TextPoint              defaultSnakeHead1     = new TextPoint(1, 5);
-    static TextPoint              defaultSnakeHead2     = new TextPoint(2, 5);
-    static String                 defaultFieldSingle    = "src/main/resources/defaultField.txt";
-    static String                 defaultFieldMulti     = "src/main/resources/field1.txt";
-    static int                    defaultNumOfStars     = 3;
-    static TextPoint              defaultP1             = new TextPoint(1, 1);
-    static Direction              defaultD1             = Direction.RIGHT;
-    static TextPoint              defaultP2             = new TextPoint(9, 17);
-    static Direction              defaultD2             = Direction.UP;
-
-    private GameType              gameType              = GameType.SINGLE;
+    private GameType              gameType      = GameType.SINGLE;
     private static GameController gameController;
     private TextPoint             fieldSize;
     private JFrame                frame;
@@ -172,23 +162,10 @@ public class Game {
         public void actionPerformed(ActionEvent e) {
             try {
                 if (gameType == GameType.SINGLE) {
-                    fieldSize = gameController.initField(defaultFieldSingle);
+                    fieldSize = gameController.initFromConfig(defaultSingle);
                 } else {
-                    fieldSize = gameController.initField(defaultFieldMulti);
+                    fieldSize = gameController.initFromConfig(defaultMulti);
                 }
-
-                gameController.initSnake(1, defaultSnakeHead1, defaultSnakeDirection,
-                        defaultSnakeSize);
-                if (gameType != GameType.SINGLE) {
-                    gameController.initSnake(2, defaultSnakeHead2, defaultSnakeDirection,
-                            defaultSnakeSize);
-
-                }
-                HashMap<TextPoint, Direction> tmp = new HashMap<TextPoint, Direction>();
-                tmp.put(defaultP1, defaultD1);
-                tmp.put(defaultP2, defaultD2);
-                gameController.initPorts(tmp);
-                gameController.addStars(defaultNumOfStars);
                 initGameField(fieldSize.row, fieldSize.col);
             } catch (IOException | OutOfFieldException | SnakeOnWallException
                     | TeleportInitException | FieldInitException | SnakeCollisionException e1) {
