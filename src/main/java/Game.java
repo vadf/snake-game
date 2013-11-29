@@ -29,8 +29,8 @@ import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 
 public class Game {
-    private final String          defaultSingle = "src/main/resources/single_game.config";
-    private final String          defaultMulti  = "src/main/resources/multi_game.config";
+    private static final String   defaultSingle = "src/main/resources/single_game.config";
+    private static final String   defaultMulti  = "src/main/resources/multi_game.config";
 
     private GameType              gameType      = GameType.SINGLE;
     private static GameController gameController;
@@ -60,7 +60,6 @@ public class Game {
 
     public void initGameField(int rows, int cols) {
         gameArea = new GameArea(rows, cols);
-        // gameArea.setText(gameController.toString());
         frame.add(gameArea, BorderLayout.CENTER);
 
         score = new JLabel("Score " + gameController.getScore());
@@ -139,7 +138,7 @@ public class Game {
         btnQuit.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                System.exit(0);
+                frame.dispose();
             }
         });
 
@@ -173,8 +172,9 @@ public class Game {
                 lStatus.setText(eStatus + ": " + e1.getMessage());
                 System.err.println(e1.getMessage());
             }
-            if (eStatus != GameStatus.LOAD_ERROR)
+            if (eStatus != GameStatus.LOAD_ERROR) {
                 eStatus = GameStatus.READY_TO_PLAY;
+            }
         }
     }
 
@@ -199,8 +199,9 @@ public class Game {
                     lStatus.setText(eStatus + ": " + e1.getMessage());
                     System.err.println(e1.getMessage());
                 }
-                if (eStatus != GameStatus.LOAD_ERROR)
+                if (eStatus != GameStatus.LOAD_ERROR) {
                     eStatus = GameStatus.READY_TO_PLAY;
+                }
             }
         }
     }
@@ -278,8 +279,8 @@ public class Game {
             add(tmp);
 
             add(new JLabel("Select Snake size"));
-            int max_size = 3 + gameController.field.getEffectiveSize() / 30;
-            final ParamSlider sliderSize = new ParamSlider(1, max_size, 3);
+            int maxSize = 3 + gameController.field.getEffectiveSize() / 30;
+            final ParamSlider sliderSize = new ParamSlider(1, maxSize, 3);
             sliderSize.setAlignmentX(LEFT_ALIGNMENT);
             add(sliderSize);
 
@@ -334,8 +335,8 @@ public class Game {
             setLayout(new BoxLayout(getContentPane(), BoxLayout.Y_AXIS));
 
             add(new JLabel("Set number of Stars"));
-            int max_size = 5 + gameController.field.getEffectiveSize() / 20;
-            final ParamSlider slider = new ParamSlider(1, max_size, 5);
+            int maxSize = 5 + gameController.field.getEffectiveSize() / 20;
+            final ParamSlider slider = new ParamSlider(1, maxSize, 5);
             add(slider);
 
             JButton btnSave = new JButton("Save");

@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class GameField {
-    final static Charset    ENCODING = StandardCharsets.UTF_8;
+    private static final Charset    ENCODING = StandardCharsets.UTF_8;
     private List<TextPoint> walls    = new ArrayList<TextPoint>();
     private int             rows;
     private int             cols;
@@ -22,8 +22,9 @@ public class GameField {
         int i = 0;
         char ch;
         for (String line : tmpField) {
-            if (cols != line.length())
+            if (cols != line.length()) {
                 throw new FieldInitException("Game Field is not rectangle.");
+            }
             for (int j = 0; j < line.length(); j++) {
                 ch = line.charAt(j);
                 if (ch != ' ') {
@@ -45,16 +46,6 @@ public class GameField {
         return rows * cols - walls.size();
     }
 
-    @Deprecated
-    public int getRowsNum() {
-        return rows;
-    }
-
-    @Deprecated
-    public int getColsNum() {
-        return cols;
-    }
-
     public List<TextPoint> getWalls() {
         return new ArrayList<TextPoint>(walls);
     }
@@ -67,15 +58,17 @@ public class GameField {
     }
 
     public boolean addWall(TextPoint p) throws OutOfFieldException {
-        if (isWall(p))
+        if (isWall(p)) {
             return false;
+        }
         walls.add(p);
         return true;
     }
 
     public boolean removeWall(TextPoint p) throws OutOfFieldException {
-        if (!isWall(p))
+        if (!isWall(p)) {
             return false;
+        }
         walls.remove(p);
         return true;
 

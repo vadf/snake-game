@@ -8,21 +8,24 @@ public class Teleport {
 
     public Teleport(TextPoint p1, Direction d1, TextPoint p2, Direction d2)
             throws TeleportInitException {
-        if (p1.equals(p2))
+        if (p1.equals(p2)) {
             throw new TeleportInitException("Initial Teleport points are equal.");
+        }
         ports.put(p1, d1);
         ports.put(p2, d2);
     }
 
     public Teleport(HashMap<TextPoint, Direction> ports) throws TeleportInitException {
-        if (ports.size() < 2)
+        if (ports.size() < 2) {
             throw new TeleportInitException("There are should be at least two ports for init.");
+        }
         this.ports = new HashMap<TextPoint, Direction>(ports);
     }
 
     public boolean add(TextPoint port, Direction d) {
-        if (ports.containsKey(port))
+        if (ports.containsKey(port)) {
             return false;
+        }
         ports.put(port, d);
         return true;
     }

@@ -7,13 +7,6 @@ public class Snake implements HeadMove {
     private Direction       direction;
     private TextPoint       border;
 
-    // Constructor w/o snake wrapping over field (can lead to OutOfBorder exception on field.isWall check)
-    @Deprecated
-    public Snake(TextPoint head, Direction direction, int snakeSize) {
-        this(head, direction, snakeSize, new TextPoint(Integer.MAX_VALUE, Integer.MAX_VALUE));
-    }
-
-    // Constructor w/ snake wrapping over field (if border is correct)
     public Snake(TextPoint head, Direction direction, int snakeSize, TextPoint border) {
         this.border = border;
         Direction oposite = Direction.RIGHT;
@@ -57,9 +50,7 @@ public class Snake implements HeadMove {
 
     public void turn(Direction direction) {
         TextPoint head = snake.get(0).move(direction);
-        if (snake.size() > 1 && (snake.get(1).equals(head) || snake.get(0).equals(head))) {            
-            ; // don't change direction
-        } else {
+        if (snake.size() <= 1 || !(snake.get(1).equals(head) || snake.get(0).equals(head))) {
             this.direction = direction;
         }
     }
@@ -67,9 +58,13 @@ public class Snake implements HeadMove {
     public void move() throws SnakeCollisionException {
         TextPoint head = snake.get(0).move(this.direction);
         head.row = head.row % border.row;
-        if (head.row < 0) head.row += border.row;
+        if (head.row < 0) {
+            head.row += border.row;
+        }
         head.col = head.col % border.col;
-        if (head.col < 0) head.col += border.col;
+        if (head.col < 0) {
+            head.col += border.col;
+        }
         if (snake.contains(head)) {
             throw new SnakeCollisionException("Snake Head is now on Snake Body.");
         }
@@ -99,9 +94,9 @@ enum Direction {
 }
 
 interface HeadMove {
-    public void changeHeadPosition(TextPoint newHead, Direction newDirection);
+    void changeHeadPosition(TextPoint newHead, Direction newDirection);
 
-    public TextPoint getHead();
+    TextPoint getHead();
 }
 
 class SnakeAddException extends Exception {

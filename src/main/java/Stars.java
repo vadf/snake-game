@@ -5,8 +5,9 @@ public class Stars {
     List<TextPoint> stars = new ArrayList<TextPoint>();
 
     public boolean add(TextPoint point) {
-        if (stars.contains(point))
+        if (stars.contains(point)) {
             return false;
+        }
         return stars.add(point);
     }
 

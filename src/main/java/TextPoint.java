@@ -16,15 +16,22 @@ public class TextPoint {
 
     @Override
     public boolean equals(Object obj) {
-        if (obj == null) return false;
-        if (obj == this) return true;
-        if (obj.getClass() != getClass()) return false;
-        TextPoint other = (TextPoint) obj;
-        if ((other.col == this.col) && (other.row == this.row))
+        if (obj == null) {
+            return false;
+        }
+        if (obj == this) {
             return true;
+        }
+        if (obj.getClass() != getClass()) {
+            return false;
+        }
+        TextPoint other = (TextPoint) obj;
+        if ((other.col == this.col) && (other.row == this.row)) {
+            return true;
+        }
         return false;
     }
-    
+
     @Override
     public String toString() {
         return "[row=" + row + ",col=" + col + "]";
@@ -55,7 +62,6 @@ public class TextPoint {
             dirCol = 0;
             dirRow = 1;
             break;
-
         }
 
         return new TextPoint(row + dirRow, col + dirCol);
