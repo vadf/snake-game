@@ -77,6 +77,14 @@ public class Snake implements HeadMove {
         return snake.get(0);
     }
 
+    public boolean isTail(TextPoint p) {
+        return p.equals(tail);
+    }
+    
+    public void cutTail() {
+        tail = snake.remove(snake.size() - 1);
+    }
+    
     public List<TextPoint> getSnake() {
         return new ArrayList<TextPoint>(snake);
     }

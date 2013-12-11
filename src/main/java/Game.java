@@ -29,10 +29,11 @@ import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 
 public class Game {
-    private static final String   defaultSingle = "src/main/resources/single_game.config";
-    private static final String   defaultMulti  = "src/main/resources/multi_game.config";
+    private static final String   defaultSingle      = "src/main/resources/single_game.config";
+    private static final String   defaultMulti       = "src/main/resources/multi_game.config";
+    private static final String   defaultMultiBattle = "src/main/resources/multi_battle_game.config";
 
-    private GameType              gameType      = GameType.SINGLE;
+    private GameType              gameType           = GameType.SINGLE;
     private static GameController gameController;
     private TextPoint             fieldSize;
     private JFrame                frame;
@@ -58,11 +59,16 @@ public class Game {
         eStatus = GameStatus.LOAD_GAME;
     }
 
+    private String gameScore() {
+        return "Score " + gameController.getScore()[0]
+                + (gameType == GameType.SINGLE ? "" : " / " + gameController.getScore()[1]);
+    }
+
     public void initGameField(int rows, int cols) {
         gameArea = new GameArea(rows, cols);
         frame.add(gameArea, BorderLayout.CENTER);
 
-        score = new JLabel("Score " + gameController.getScore());
+        score = new JLabel(gameScore());
         frame.add(score, BorderLayout.SOUTH);
 
         lStatus = new JLabel(eStatus.toString());
@@ -81,8 +87,10 @@ public class Game {
         JRadioButton rbSingle = new JRadioButton("Single Snake classic");
         rbSingle.setSelected(true);
         JRadioButton rbMulti = new JRadioButton("Two Snakes");
+        JRadioButton rbMultiBattle = new JRadioButton("Two Snakes Battle");
         group.add(rbSingle);
         group.add(rbMulti);
+        group.add(rbMultiBattle);
         Dimension btnSize = new Dimension(200, 25);
         JButton btnDefault = new JButton("Default Game");
         JButton btnGame = new JButton("Game Constructor");
@@ -109,6 +117,14 @@ public class Game {
                 gameController.setType(gameType);
             }
         });
+        rbMultiBattle.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                gameType = GameType.MULTI_BATTLE;
+                gameController.setType(gameType);
+            }
+        });
+
         btnDefault.addActionListener(this.new DefaultGame());
         btnGame.addActionListener(this.new LoadGame());
         btnStart.addActionListener(new ActionListener() {
@@ -138,12 +154,14 @@ public class Game {
         btnQuit.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                timer.stop();
                 frame.dispose();
             }
         });
 
         pLoad.add(rbSingle);
         pLoad.add(rbMulti);
+        pLoad.add(rbMultiBattle);
         pLoad.add(btnDefault);
         pLoad.add(btnGame);
         pLoad.add(btnStart);
@@ -162,8 +180,10 @@ public class Game {
             try {
                 if (gameType == GameType.SINGLE) {
                     fieldSize = gameController.initFromConfig(defaultSingle);
-                } else {
+                } else if (gameType == GameType.MULTI) {
                     fieldSize = gameController.initFromConfig(defaultMulti);
+                } else if (gameType == GameType.MULTI_BATTLE) {
+                    fieldSize = gameController.initFromConfig(defaultMultiBattle);
                 }
                 initGameField(fieldSize.row, fieldSize.col);
             } catch (IOException | OutOfFieldException | SnakeOnWallException
@@ -257,7 +277,7 @@ public class Game {
                 System.err.println(e1.getMessage());
                 timer.stop();
             }
-            score.setText("Score " + gameController.getScore());
+            score.setText(gameScore());
         }
     }
 

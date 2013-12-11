@@ -129,14 +129,28 @@ public class GameController {
 
     public void move() throws SnakeOnWallException, OutOfFieldException, SnakeAddException,
             SnakeCollisionException {
+        // TODO: re-factor, too messy
         for (int j = 0; j < snake.length; j++) {
             if (gameType == GameType.SINGLE && j >= 1) {
                 break;
             }
-            snake[j].move();
+            try {
+                snake[j].move();
+            } catch (SnakeCollisionException e) {
+                if (gameType == GameType.MULTI_BATTLE) {
+                    // TODO: choose direction randomly
+                    initSnake(j + 1, getEmptyPoint(), Direction.RIGHT, 1);
+                    continue;
+                } else {
+                    throw e;
+                }
+            }
             TextPoint head = snake[j].getHead();
-            if (field.isWall(head)) {
+            if (field.isWall(head) && gameType != GameType.MULTI_BATTLE) {
                 throw new SnakeOnWallException("Snake Head is on the Wall");
+            } else if (field.isWall(head) && gameType == GameType.MULTI_BATTLE) {
+                initSnake(j + 1, getEmptyPoint(), Direction.RIGHT, 1);
+                continue;
             }
             if (stars.isStar(head)) {
                 snake[j].add();
@@ -151,11 +165,31 @@ public class GameController {
             }
         }
 
-        if ((gameType == GameType.MULTI)
-                && (snake[0].isOnSnake(snake[1].getHead()) || snake[1]
-                        .isOnSnake(snake[0].getHead()))) {
-            throw new SnakeCollisionException("Snakes crash");
-
+        if (gameType != GameType.SINGLE) {
+            boolean isClash = snake[0].isOnSnake(snake[1].getHead())
+                    || snake[1].isOnSnake(snake[0].getHead());
+            boolean isNotBattle = gameType == GameType.MULTI;
+            if (isClash) {
+                // eat other snake tail or restart smaller snake on clash (if battle)
+                if (isNotBattle) {
+                    throw new SnakeCollisionException("Snakes clash");
+                } else if (snake[0].isTail(snake[1].getHead())) {
+                    snake[0].cutTail();
+                    score[1]++;
+                    snake[1].add();
+                } else if (snake[1].isTail(snake[0].getHead())) {
+                    snake[1].cutTail();
+                    score[0]++;
+                    snake[0].add();
+                } else if (snake[0].getSize() > snake[1].getSize()) {
+                    initSnake(2, getEmptyPoint(), Direction.RIGHT, 1);
+                } else if (snake[0].getSize() < snake[1].getSize()) {
+                    initSnake(1, getEmptyPoint(), Direction.RIGHT, 1);
+                } else if (snake[0].getSize() == snake[1].getSize()) {
+                    initSnake(1, getEmptyPoint(), Direction.RIGHT, 1);
+                    initSnake(2, getEmptyPoint(), Direction.RIGHT, 1);
+                }
+            }
         }
     }
 
