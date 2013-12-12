@@ -62,6 +62,9 @@ public class TextPoint {
             dirCol = 0;
             dirRow = 1;
             break;
+        case NONE:
+        default:
+            break;
         }
 
         return new TextPoint(row + dirRow, col + dirCol);

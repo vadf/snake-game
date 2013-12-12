@@ -170,15 +170,27 @@ public class GameController {
                     || snake[1].isOnSnake(snake[0].getHead());
             boolean isNotBattle = gameType == GameType.MULTI;
             if (isClash) {
-                // eat other snake tail or restart smaller snake on clash (if battle)
+                // eat other snake tail or restart smaller snake on clash (if
+                // battle)
                 if (isNotBattle) {
                     throw new SnakeCollisionException("Snakes clash");
+                } else if (snake[0].getSize() == 1 && snake[1].getSize() == 1) {
+                    initSnake(1, getEmptyPoint(), Direction.RIGHT, 1);
+                    initSnake(2, getEmptyPoint(), Direction.RIGHT, 1);
                 } else if (snake[0].isTail(snake[1].getHead())) {
-                    snake[0].cutTail();
+                    if (snake[0].getSize() == 1) {
+                        initSnake(1, getEmptyPoint(), Direction.RIGHT, 1);
+                    } else {
+                        snake[0].cutTail();
+                    }
                     score[1]++;
                     snake[1].add();
                 } else if (snake[1].isTail(snake[0].getHead())) {
-                    snake[1].cutTail();
+                    if (snake[1].getSize() == 1) {
+                        initSnake(2, getEmptyPoint(), Direction.RIGHT, 1);
+                    } else {
+                        snake[1].cutTail();
+                    }
                     score[0]++;
                     snake[0].add();
                 } else if (snake[0].getSize() > snake[1].getSize()) {

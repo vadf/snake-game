@@ -23,6 +23,12 @@ public class Snake implements HeadMove {
         case DOWN:
             oposite = Direction.UP;
             break;
+        case NONE:
+        default:
+            direction = Direction.RIGHT;
+            oposite = Direction.LEFT;
+            System.err.println(Direction.RIGHT + " is choosen as default");
+            break;
         }
         snake.add(head);
         turn(direction);
@@ -50,12 +56,16 @@ public class Snake implements HeadMove {
 
     public void turn(Direction direction) {
         TextPoint head = snake.get(0).move(direction);
-        if (snake.size() <= 1 || !(snake.get(1).equals(head) || snake.get(0).equals(head))) {
+        if (direction == Direction.NONE || snake.size() <= 1
+                || !(snake.get(1).equals(head) || snake.get(0).equals(head))) {
             this.direction = direction;
         }
     }
 
     public void move() throws SnakeCollisionException {
+        if (direction == Direction.NONE) {
+            return;
+        }
         TextPoint head = snake.get(0).move(this.direction);
         head.row = head.row % border.row;
         if (head.row < 0) {
@@ -78,13 +88,13 @@ public class Snake implements HeadMove {
     }
 
     public boolean isTail(TextPoint p) {
-        return p.equals(tail);
+        return p.equals(snake.get(snake.size() - 1));
     }
-    
+
     public void cutTail() {
         tail = snake.remove(snake.size() - 1);
     }
-    
+
     public List<TextPoint> getSnake() {
         return new ArrayList<TextPoint>(snake);
     }
@@ -98,7 +108,7 @@ public class Snake implements HeadMove {
 }
 
 enum Direction {
-    RIGHT, LEFT, UP, DOWN
+    RIGHT, LEFT, UP, DOWN, NONE
 }
 
 interface HeadMove {

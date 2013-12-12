@@ -206,4 +206,35 @@ public class TestSnake {
         TextPoint actual = snake.getHead();
         assertEquals("Check new Snake Head", expected, actual);
     }
+
+    @Test
+    public void testIsTailTrue() {
+        TextPoint tail = new TextPoint(head.row, head.col - snakeSize + 1);
+        assertTrue(snake.isTail(tail));
+    }
+
+    @Test
+    public void testIsTailFalse() {
+        TextPoint tail = new TextPoint(head);
+        assertFalse(snake.isTail(tail));
+    }
+
+    @Test
+    public void testCutTail() throws SnakeCollisionException {
+        snake.move();
+        snake.cutTail();
+        assertEquals(2, snake.getSize());
+        TextPoint oldTail = new TextPoint(head.row, head.col - snakeSize + 2);
+        assertFalse(snake.isOnSnake(oldTail));
+    }
+
+    @Test
+    public void testMoveNone() throws SnakeCollisionException {
+        snake.turn(Direction.NONE);
+        snake.move();
+
+        TextPoint expected = new TextPoint(head);
+        TextPoint actual = snake.getHead();
+        assertEquals("Check Snake Head.", expected, actual);
+    }
 }

@@ -322,4 +322,143 @@ public class TestGameController {
         TextPoint p = game.getEmptyPoint();
         assertNull("Check that there are no empty points", p);
     }
+
+    @Test
+    public void testBattle_snakeRestartsOnWall() throws OutOfFieldException, IOException,
+            SnakeOnWallException, SnakeAddException, SnakeCollisionException, FieldInitException {
+        game.initField(testField);
+        game.setType(GameType.MULTI_BATTLE);
+        game.initSnake(1, new TextPoint(1, 5), snakeDirection, snakeSize);
+        game.initSnake(2, new TextPoint(2, 5), snakeDirection, 1);
+        game.snake[1].turn(Direction.NONE);
+        game.move();
+        int actual = game.snake[0].getSize();
+        int expected = 1;
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    public void testBattle_snakesClash() throws OutOfFieldException, IOException,
+            SnakeOnWallException, SnakeAddException, SnakeCollisionException, FieldInitException {
+        game.initField(testField);
+        game.setType(GameType.MULTI_BATTLE);
+        game.initSnake(1, snakeHead, snakeDirection, snakeSize);
+        game.initSnake(2, new TextPoint(2, 4), Direction.UP, 1);
+        game.move();
+        int actual1 = game.snake[0].getSize();
+        int expected1 = snakeSize;
+        assertEquals(expected1, actual1);
+        int actual2 = game.snake[1].getSize();
+        int expected2 = 1;
+        assertEquals(expected2, actual2);
+    }
+
+    @Test
+    public void testBattle_snakesEqualsClash1() throws OutOfFieldException, IOException,
+            SnakeOnWallException, SnakeAddException, SnakeCollisionException, FieldInitException {
+        game.initField(testField);
+        game.setType(GameType.MULTI_BATTLE);
+        game.initSnake(1, new TextPoint(1, 2), Direction.RIGHT, 1);
+        game.initSnake(2, new TextPoint(1, 4), Direction.LEFT, 1);
+
+        game.move();
+
+        int actual1 = game.snake[0].getSize();
+        int expected1 = 1;
+        assertEquals(expected1, actual1);
+        int actual2 = game.snake[1].getSize();
+        int expected2 = 1;
+        assertEquals(expected2, actual2);
+    }
+
+    @Test
+    public void testBattle_snakesEqualsClash2() throws OutOfFieldException, IOException,
+            SnakeOnWallException, SnakeAddException, SnakeCollisionException, FieldInitException {
+        game.initField(testField);
+        game.setType(GameType.MULTI_BATTLE);
+        game.initSnake(1, new TextPoint(1, 2), Direction.RIGHT, 2);
+        game.initSnake(2, new TextPoint(1, 4), Direction.LEFT, 2);
+        game.move();
+        int actual1 = game.snake[0].getSize();
+        int expected1 = 1;
+        assertEquals(expected1, actual1);
+        int actual2 = game.snake[1].getSize();
+        int expected2 = 1;
+        assertEquals(expected2, actual2);
+    }
+
+    @Test
+    public void testBattle_snakeCollision() throws OutOfFieldException, IOException,
+            SnakeOnWallException, SnakeAddException, SnakeCollisionException, FieldInitException {
+        game.initField(testField);
+        game.setType(GameType.MULTI_BATTLE);
+        game.initSnake(1, new TextPoint(1, 5), snakeDirection, 5);
+        game.initSnake(2, new TextPoint(2, 2), snakeDirection, 1);
+
+        game.snake[1].turn(Direction.NONE);
+        game.snake[0].turn(Direction.DOWN);
+        game.move();
+        game.snake[0].turn(Direction.LEFT);
+        game.move();
+        game.snake[0].turn(Direction.UP);
+        game.move();
+        int actual1 = game.snake[0].getSize();
+        int expected1 = 1;
+        assertEquals(expected1, actual1);
+    }
+
+    @Test
+    public void testBattle_CatchTail() throws OutOfFieldException, IOException,
+            SnakeOnWallException, SnakeAddException, SnakeCollisionException, FieldInitException {
+        game.initField(testField);
+        game.setType(GameType.MULTI_BATTLE);
+        game.initSnake(1, snakeHead, snakeDirection, snakeSize);
+        game.initSnake(2, new TextPoint(2, 2), Direction.UP, 1);
+
+        game.snake[0].turn(Direction.NONE);
+        game.move();
+
+        int actual1 = game.snake[0].getSize();
+        int expected1 = 2;
+        assertEquals(expected1, actual1);
+        int actual2 = game.snake[1].getSize();
+        int expected2 = 2;
+        assertEquals(expected2, actual2);
+    }
+
+    @Test
+    public void testBattle_CatchTail2() throws OutOfFieldException, IOException,
+            SnakeOnWallException, SnakeAddException, SnakeCollisionException, FieldInitException {
+        game.initField(testField);
+        game.setType(GameType.MULTI_BATTLE);
+        game.initSnake(1, new TextPoint(1, 3), snakeDirection, snakeSize);
+        game.initSnake(2, new TextPoint(2, 2), Direction.UP, 1);
+
+        game.move();
+
+        int actual1 = game.snake[0].getSize();
+        int expected1 = 2;
+        assertEquals(expected1, actual1);
+        int actual2 = game.snake[1].getSize();
+        int expected2 = 2;
+        assertEquals(expected2, actual2);
+    }
+
+    @Test
+    public void testBattle_CatchTail3() throws OutOfFieldException, IOException,
+            SnakeOnWallException, SnakeAddException, SnakeCollisionException, FieldInitException {
+        game.initField(testField);
+        game.setType(GameType.MULTI_BATTLE);
+        game.initSnake(1, new TextPoint(1, 3), Direction.RIGHT, 2);
+        game.initSnake(2, new TextPoint(1, 5), Direction.LEFT, 1);
+
+        game.move();
+
+        int actual1 = game.snake[0].getSize();
+        int expected1 = 3;
+        assertEquals(expected1, actual1);
+        int actual2 = game.snake[1].getSize();
+        int expected2 = 1;
+        assertEquals(expected2, actual2);
+    }
 }
